@@ -1,6 +1,7 @@
--- adds timestamp to every string except combat log 
+﻿-- adds timestamp to every string except combat log 
 local _G = getfenv(0)
-local pattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d]+"
+local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d]+"
+local channelPattern = "^%[%w+:?%]"
 local URLCONST = "URL"
 
 -- doesnt work, no pcre compatible regular expressions
@@ -22,14 +23,59 @@ StaticPopupDialogs["CHAT_LINK"] = {
   hideOnEscape = true,
 }
 
+local SHORTAGE = {
+	["channel:1"] = "[1]",
+	["channel:2"] = "[2]",
+	["channel:3"] = "[3]",
+	["channel:4"] = "[4]",
+	["channel:5"] = "[5]",
+	
+	["CHANNEL:1"] = "[1]",
+	["CHANNEL:2"] = "[2]",
+	["CHANNEL:3"] = "[3]",
+	["CHANNEL:4"] = "[4]",
+	["CHANNEL:5"] = "[5]",
+	
+	["[Группа]"] = "[P]",
+	["[Лидер группы]"] = "[PL]",
+	
+	["[Поле боя]"] = "BG",	
+	["[Лидер поля боя]"] = "[BGL]",
+	["[Рейд]"] ="[R]",
+	["[Лидер рейда]"]="[RL]",
+	
+	["[Гильдия]"] ="[G]"
+}
 
 -- converts "http://ya.ru" to {@link http://www.wowwiki.com/ItemLink}
 local function formUrlLink(text)
   return "|cffffd000|H" .. URLCONST .. ":" .. text .. "|h" .. text .. "|h|r"
 end
 
+function formChannelName(text)
+--	print (text)
+	
+  -- print(urltype) -- channel 
+  -- print(urllink) -- PARTY  channel:1
+  -- print("text=".. text) -- Лидер группы
+  -- print("link=".. link) -- Лидер группы
+  
+  -- if (urltype == "channel") then
+	-- local value = SHORTAGE[urllink]
+	-- if (value ~= nil) then
+		-- real_OnHyperlinkShow(self, link, value, button)
+		-- print(" got:"..value)
+	-- end;
+	
+	-- real_OnHyperlinkShow(self, link, text, button)	
+
+end
+
 local function hook_addMessage(self, text, ...)
-  local fomattedText = text:gsub(pattern, formUrlLink)
+  --formChannelName(text)  
+  local fomattedText = text:gsub(urlPattern, formUrlLink)
+  fomattedText = fomattedText:gsub(channelPattern, formChannelName)
+  
   local timestamp = date("%H:%M:%S")
   self:old_addMessage(timestamp .. " " .. fomattedText, ...)
 end
@@ -38,7 +84,7 @@ end
 local real_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
 function ChatFrame_OnHyperlinkShow(self, link, text, button)
   local urltype, urllink = link:match("(%a+):(.+)")
-  print(urltype, urllink, text)
+
   if (urltype == URLCONST) then
     local popup = StaticPopup_Show("CHAT_LINK")
     popup.editBox:SetText(urllink)
@@ -57,3 +103,4 @@ for i = 1, NUM_CHAT_WINDOWS do
     frame.AddMessage = hook_addMessage
   end
 end
+  

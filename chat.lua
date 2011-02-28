@@ -24,60 +24,49 @@ StaticPopupDialogs["CHAT_LINK"] = {
 }
 
 local SHORTAGE = {
-	["channel:1"] = "[1]",
-	["channel:2"] = "[2]",
-	["channel:3"] = "[3]",
-	["channel:4"] = "[4]",
-	["channel:5"] = "[5]",
+	["channel:1"] = "1",
+	["channel:2"] = "2",
+	["channel:3"] = "3",
+	["channel:4"] = "4",
+	["channel:5"] = "5",
 	
-	["CHANNEL:1"] = "[1]",
-	["CHANNEL:2"] = "[2]",
-	["CHANNEL:3"] = "[3]",
-	["CHANNEL:4"] = "[4]",
-	["CHANNEL:5"] = "[5]",
+	["CHANNEL:1"] = "1",
+	["CHANNEL:2"] = "2",
+	["CHANNEL:3"] = "3",
+	["CHANNEL:4"] = "4",
+	["CHANNEL:5"] = "5",
 	
-	["[Группа]"] = "[P]",
-	["[Лидер группы]"] = "[PL]",
+	["GUILD"] = "G",
+	 
+	["PARTY"] = "P",
+	["[Лидер группы]"] = "PL",
 	
 	["[Поле боя]"] = "BG",	
-	["[Лидер поля боя]"] = "[BGL]",
-	["[Рейд]"] ="[R]",
-	["[Лидер рейда]"]="[RL]",
+	["[Лидер поля боя]"] = "BGL",
 	
-	["[Гильдия]"] ="[G]"
+	["RAID"] ="R",
+	["[Лидер рейда]"]="RL",
 }
 
 -- converts "http://ya.ru" to {@link http://www.wowwiki.com/ItemLink}
 local function formUrlLink(text)
-  return "|cffffd000|H" .. URLCONST .. ":" .. text .. "|h" .. text .. "|h|r"
+  local result =  "|cffffd000|H" .. URLCONST .. ":" .. text .. "|h" .. text .. "|h|r"
+  return result
 end
 
-function formChannelName(text)
---	print (text)
-	
-  -- print(urltype) -- channel 
-  -- print(urllink) -- PARTY  channel:1
-  -- print("text=".. text) -- Лидер группы
-  -- print("link=".. link) -- Лидер группы
-  
-  -- if (urltype == "channel") then
-	-- local value = SHORTAGE[urllink]
-	-- if (value ~= nil) then
-		-- real_OnHyperlinkShow(self, link, value, button)
-		-- print(" got:"..value)
-	-- end;
-	
-	-- real_OnHyperlinkShow(self, link, text, button)	
-
+function formChannelName(text, modif)
+  -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
+	local value = SHORTAGE[modif] and SHORTAGE[modif] or SHORTAGE[text]
+	if (value ~= nil) then
+		return "|Hchannel:"..text.."|h["..value.."]|h"
+	end
 end
 
-local function hook_addMessage(self, text, ...)
-  --formChannelName(text)  
-  local fomattedText = text:gsub(urlPattern, formUrlLink)
-  fomattedText = fomattedText:gsub(channelPattern, formChannelName)
-  
-  local timestamp = date("%H:%M:%S")
-  self:old_addMessage(timestamp .. " " .. fomattedText, ...)
+local function hook_addMessage(self, text, ...)  
+  local fomattedText = text:gsub("^|Hchannel:(%a+:%d)|h(%b[])|h", formChannelName)   
+  fomattedText = fomattedText:gsub("^|Hchannel:(%a+)|h(%b[])|h", formChannelName)
+  fomattedText = fomattedText:gsub(urlPattern, formUrlLink)     
+  self:old_addMessage(date("%H:%M:%S") .. " " .. fomattedText, ...)
 end
 
 -- source: http://wowprogramming.com/utils/xmlbrowser/diff/FrameXML/ChatFrame.xml

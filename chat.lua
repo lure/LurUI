@@ -1,10 +1,10 @@
 ﻿-- adds timestamp to every string except combat log 
 local _G = getfenv(0)
 local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d]+"
-local channelPattern = "^%[%w+:?%]"
+local channelPattern = "^|Hchannel:(%a+[:%d+]?)|h(%b[])|h"
 local URLCONST = "URL"
 
--- doesnt work, no pcre compatible regular expressions
+-- doesnt work: no pcre compatible regular expressions
 -- local pattern = "((www|ftp|mailto|https|callto)\://)?(www\.)?[\d\w-_/\.]+\.[\w\d]+"
 
 
@@ -50,22 +50,21 @@ local SHORTAGE = {
 
 -- converts "http://ya.ru" to {@link http://www.wowwiki.com/ItemLink}
 local function formUrlLink(text)
-  local result =  "|cffffd000|H" .. URLCONST .. ":" .. text .. "|h" .. text .. "|h|r"
-  return result
+  return string.format("|cffffd000|H%s:%s|h%s|h|r", URLCONST, text, text)
 end
 
 function formChannelName(text, modif)
   -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
+	-- print(text.." "..modif)
 	local value = SHORTAGE[modif] and SHORTAGE[modif] or SHORTAGE[text]
 	if (value ~= nil) then
-		return "|Hchannel:"..text.."|h["..value.."]|h"
+		return string.format("|Hchannel:%s|h[%s]|h", text, value)
 	end
 end
 
 local function hook_addMessage(self, text, ...)  
-  local fomattedText = text:gsub("^|Hchannel:(%a+:%d)|h(%b[])|h", formChannelName)   
-  fomattedText = fomattedText:gsub("^|Hchannel:(%a+)|h(%b[])|h", formChannelName)
-  fomattedText = fomattedText:gsub(urlPattern, formUrlLink)     
+  local fomattedText = text:gsub("^|Hchannel:(%a+:?%d?)|h(%b[])|h", formChannelName)
+  fomattedText = fomattedText:gsub(urlPattern, formUrlLink)
   self:old_addMessage(date("%H:%M:%S") .. " " .. fomattedText, ...)
 end
 

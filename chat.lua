@@ -1,7 +1,7 @@
 ﻿-- adds timestamp to every string except combat log 
 local _G = getfenv(0)
 local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d]+"
-local channelPattern = "^|Hchannel:(%a+[:%d+]?)|h(%b[])|h"
+local channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h"
 local URLCONST = "URL"
 
 -- doesnt work: no pcre compatible regular expressions
@@ -53,7 +53,7 @@ local function formUrlLink(text)
   return string.format("|cffffd000|H%s:%s|h%s|h|r", URLCONST, text, text)
 end
 
-function formChannelName(text, modif)
+local function formChannelName(text, modif)
   -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
 	-- print(text.." "..modif)
 	local value = SHORTAGE[modif] and SHORTAGE[modif] or SHORTAGE[text]
@@ -63,7 +63,7 @@ function formChannelName(text, modif)
 end
 
 local function hook_addMessage(self, text, ...)  
-  local fomattedText = text:gsub("^|Hchannel:(%a+:?%d?)|h(%b[])|h", formChannelName)
+  local fomattedText = text:gsub(channelPattern, formChannelName)
   fomattedText = fomattedText:gsub(urlPattern, formUrlLink)
   self:old_addMessage(date("%H:%M:%S") .. " " .. fomattedText, ...)
 end

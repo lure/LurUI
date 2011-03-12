@@ -12,7 +12,9 @@ coord:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE, MONOCHROME")
 WorldMapFrame:HookScript("OnUpdate", function(self, button)
         local px, py = roundCoords(GetPlayerMapPosition("player"))
 		local mx, my = GetMouseCoord()
-		local playerCoords = string.format("you = %02.1f / %02.1f mouse = %02.1f / %02.1f", px, py, mx, my)
+        mx = mx > 0 and string.format("%02.1f", mx) or "00.0"
+        my = my > 0 and  string.format("%02.1f", my)  or "00.0"
+        local playerCoords = string.format("you = %02.1f / %02.1f mouse = %s / %s", px, py, mx, my)
 		coord:SetText(playerCoords)
     end)
 

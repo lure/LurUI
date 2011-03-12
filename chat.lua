@@ -91,4 +91,3 @@ for i = 1, NUM_CHAT_WINDOWS do
     frame.AddMessage = hook_addMessage
   end
 end
-  

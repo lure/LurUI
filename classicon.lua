@@ -1,7 +1,7 @@
 --http://us.blizzard.com/support/article.xml?locale=en_US&articleId=21466&pageNumber=1&searchQuery=Blizzard+Interface
 local lurui = {}
-lurui.frame = CreateFrame("Frame", "classicon", TargetFrame)
-local f = lurui.frame
+lurui.targetClassFrame = CreateFrame("Frame", "classicon", TargetFrame)
+local f = lurui.targetClassFrame
 f:SetWidth(32)
 f:SetHeight(32)
 f:SetFrameStrata("MEDIUM")
@@ -29,7 +29,7 @@ end)
 f.PLAYER_TARGET_CHANGED = function(self, ...)
    local _, className = UnitClass("target")
    if (className) then
-      lurui.frame.texture:SetTexCoord(unpack(CLASS_ICON_TCOORDS[className]));
+      lurui.targetClassFrame.texture:SetTexCoord(unpack(CLASS_ICON_TCOORDS[className]));
    end
 end
 

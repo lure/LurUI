@@ -11,4 +11,4 @@ map.lua
 poison.lua
 chat.lua
 classicon.lua
-testframe.xml
+--testframe.xml

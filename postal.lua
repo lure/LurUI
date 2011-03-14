@@ -5,7 +5,7 @@
 	при вызове из себя же
 ]] --
 
-local currentMail, totalMoney, lastMoney, lastAttach = 0, 0, 0, 0;
+local currentMail, totalCount, totalMoney, lastMoney, lastAttach = 0, 0, 0, 0;
 local slotsExists = true;
 local inprogress = false;
 local chosen = "all"
@@ -32,7 +32,6 @@ hooksecurefunc(MailFrame, "Hide", function()
         printMoney(totalMoney)
     end
     inprogress = false;
-    currentMail, totalMoney, lastMoney, lastAttach = 0, 0, 0, 0;
     selectedID = {}
 end)
 
@@ -51,10 +50,11 @@ mailButton:SetText("Get mail")
 mailButton:SetScript("OnClick", function()
     if (not inprogress) then
         chosen = UIDropDownMenu_GetText(PostalMailTypes)
-        inprogress = true;
-        currentMail, totalMoney, lastMoney, lastAttach = 0, 0, 0, 0;
 
+        inprogress = true;
+        currentMail, totalMoney, lastMoney, lastAttach, totalCount = 0, 0, 0, 0, 0;
         mailID, _ = GetInboxNumItems();
+
         print("you got " .. mailID .. " letters in your box")
         getAllMail();
     end;
@@ -72,10 +72,15 @@ function getAllMail()
                     return waitframe:Show();
                 end
 
+                if ( currentMail ~= mailID) then
+                    print("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
+                    totalCount = totalCount + 1;
+                    currentMail = mailID
+                end
+
                 if (msgMoney > 0) then
                     lastMoney = msgMoney
                     totalMoney = totalMoney + msgMoney
-                    print("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
                     TakeInboxMoney(mailID); -- забираем деньги, ибо остальное подождёт
                     return waitframe:Show();
                 end
@@ -111,7 +116,7 @@ function getAllMail()
 end
 
 function printMoney(money)
-    print("POSTAL: Total amount = [ " .. getMoneyString(parseMoney(money)) .. " ]")
+    print("POSTAL: Total amount = [ " .. getMoneyString(parseMoney(money)) .. " ], total letters = "..totalCount)
 end
 
 -- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)
@@ -120,7 +125,10 @@ function checkAH(sender)
 end
 
 function checkSelected()
-    return (chosen ~= "selected") or (selectedID[mailID] ~= nil)
+    local result = (chosen ~= "selected") or (selectedID[mailID] ~= nil)
+    selectedID[mailID] = nil
+
+    return result;
 end
 
 

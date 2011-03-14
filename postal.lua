@@ -3,7 +3,7 @@
 
 	если вызывается из фрейма - значит не ждать, а брать вещь и вызывать себя же
 	при вызове из себя же
-]] --
+  ]] --
 
 local currentMail, totalCount, totalMoney, lastMoney, lastAttach = 0, 0, 0, 0;
 local slotsExists = true;
@@ -11,6 +11,7 @@ local inprogress = false;
 local chosen = "all"
 local selectedID = {}
 local mailID = 0;
+
 
 -- [[ WaitForSingleObject from ThreadAPI imitation ]] --
 local waitframe = CreateFrame("Frame", nil, UIParent)
@@ -48,6 +49,8 @@ mailButton = CreateFrame("Button", nil, InboxFrame, "OptionsButtonTemplate")
 mailButton:SetPoint("TOPRIGHT", -41, -41)
 mailButton:SetText("Get mail")
 mailButton:SetScript("OnClick", function()
+    print(UIDropDownMenu_GetText(PostalMailTypes) == "selected")
+    if (1==1) then return end
     if (not inprogress) then
         chosen = UIDropDownMenu_GetText(PostalMailTypes)
 
@@ -57,14 +60,14 @@ mailButton:SetScript("OnClick", function()
 
         print("you got " .. mailID .. " letters in your box")
         getAllMail();
-    end;
+    end
 end)
 
 function getAllMail()
     if mailID > 0 then
         local sender, subj, msgMoney, CODAmount, _, msgItemCount = select(3, GetInboxHeaderInfo(mailID))
 
-        if ((msgItemCount or msgMoney > 0) and checkAH(sender) and checkSelected()) then
+        if ((msgItemCount or msgMoney > 0) and (checkAH(sender) or checkSelected() or checkAll())) then
             if (CODAmount == 0) then
             -- looting if there are no COD
                 if ((lastMoney > 0 and lastMoney == msgMoney) or lastAttach == msgItemCount) then
@@ -121,16 +124,22 @@ end
 
 -- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)
 function checkAH(sender)
-    return (chosen ~= "auction") or (GetInboxInvoiceInfo(mailID) ~= nil or (sender:match("^Аукционный дом.+") ~= nil))
+    return (chosen == "auction") and
+            (GetInboxInvoiceInfo(mailID) ~= nil or (sender:match("^Аукционный дом.+") ~= nil))
 end
 
 function checkSelected()
-    local result = (chosen ~= "selected") or (selectedID[mailID] ~= 0)
-    selectedID[mailID] = 0
-
-    return result;
+    if (chosen == "selected") then
+        local result = (selectedID[mailID]) and (selectedID[mailID] ~= 0)
+        selectedID[mailID] = 0
+        return result;
+    end
+    return false
 end
 
+function checkAll()
+    return chosen == "all"
+end
 
 function getMoneyString(gold, silver, copper)
     return string.format("%dg %ds %dc", gold, silver, copper)

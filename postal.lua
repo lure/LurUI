@@ -49,8 +49,6 @@ mailButton = CreateFrame("Button", nil, InboxFrame, "OptionsButtonTemplate")
 mailButton:SetPoint("TOPRIGHT", -41, -41)
 mailButton:SetText("Get mail")
 mailButton:SetScript("OnClick", function()
-    print(UIDropDownMenu_GetText(PostalMailTypes) == "selected")
-    if (1==1) then return end
     if (not inprogress) then
         chosen = UIDropDownMenu_GetText(PostalMailTypes)
 

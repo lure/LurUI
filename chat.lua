@@ -1,6 +1,6 @@
 ﻿-- adds timestamp to every string except combat log 
 local _G = getfenv(0)
-local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:]+"
+local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%]+"
 local channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h"
 local URLCONST = "URL"
 

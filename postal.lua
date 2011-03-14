@@ -32,13 +32,13 @@ hooksecurefunc(MailFrame, "Hide", function()
         printMoney(totalMoney)
     end
     inprogress = false;
-    selectedID = {}
+    clearSelectedID()
 end)
 
 hooksecurefunc("InboxFrame_Update", function()
     local index = ((InboxFrame.pageNum - 1) * INBOXITEMS_TO_DISPLAY);
     for i = 1, 7 do
-        _G["MailItem" .. i].checkBox:SetChecked(selectedID[index + i] ~= nil);
+        _G["MailItem" .. i].checkBox:SetChecked(selectedID[index + i] == 1);
     end
 end)
 
@@ -72,7 +72,7 @@ function getAllMail()
                     return waitframe:Show();
                 end
 
-                if ( currentMail ~= mailID) then
+                if (currentMail ~= mailID) then
                     print("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
                     totalCount = totalCount + 1;
                     currentMail = mailID
@@ -116,7 +116,7 @@ function getAllMail()
 end
 
 function printMoney(money)
-    print("POSTAL: Total amount = [ " .. getMoneyString(parseMoney(money)) .. " ], total letters = "..totalCount)
+    print("POSTAL: Total amount = [ " .. getMoneyString(parseMoney(money)) .. " ], total letters = " .. totalCount)
 end
 
 -- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)
@@ -125,8 +125,8 @@ function checkAH(sender)
 end
 
 function checkSelected()
-    local result = (chosen ~= "selected") or (selectedID[mailID] ~= nil)
-    selectedID[mailID] = nil
+    local result = (chosen ~= "selected") or (selectedID[mailID] ~= 0)
+    selectedID[mailID] = 0
 
     return result;
 end
@@ -143,6 +143,11 @@ function parseMoney(money)
     return msgGold, msgSilver, msgCopper;
 end
 
+function clearSelectedID()
+    for i = 1, INBOXITEMS_TO_DISPLAY do
+        selectedID[i] = 0
+    end
+end
 
 -- [[ DROP DOWN MENU ]] --
 -- moving MailItemFrames to the right by 20px. Some lines below they are shortened by that 20px
@@ -163,7 +168,7 @@ for i = 1, 7 do
             self:SetChecked(false)
             return;
         end
-        selectedID[_G["MailItem" .. i .. "Button"].index] = self:GetChecked() and 1 or nil
+        selectedID[_G["MailItem" .. i .. "Button"].index] = self:GetChecked() and 1 or 0
     end)
     mailItemFrame.checkBox = checkBox;
 end
@@ -176,7 +181,7 @@ local items = {
 }
 
 local function initialize(self, level)
-    local info = UIDropDownMenu_CreateInfo() -- why this?
+    local info
     for k, v in pairs(items) do
         info = UIDropDownMenu_CreateInfo()
         info.text = k

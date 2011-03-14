@@ -64,8 +64,8 @@ function getAllMail()
     if mailID > 0 then
         local sender, subj, msgMoney, CODAmount, _, msgItemCount = select(3, GetInboxHeaderInfo(mailID))
 
-        if (msgItemCount or msgMoney > 0) then
-            if (CODAmount == 0 and checkAH(sender) and checkSelected()) then
+        if ((msgItemCount or msgMoney > 0) and checkAH(sender) and checkSelected()) then
+            if (CODAmount == 0) then
             -- looting if there are no COD
                 if ((lastMoney > 0 and lastMoney == msgMoney) or lastAttach == msgItemCount) then
                 -- wait longer cos money has not been looted yet

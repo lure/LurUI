@@ -188,6 +188,3 @@ UIDropDownMenu_SetButtonWidth(PostalMailTypes, 124)
 UIDropDownMenu_SetSelectedID(PostalMailTypes, 1)
 UIDropDownMenu_SetText(PostalMailTypes, items["all"])
 UIDropDownMenu_JustifyText(PostalMailTypes, "LEFT")
-
-
---items[UIDropDownMenu_GetSelectedID(PostalMailTypes)]

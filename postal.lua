@@ -5,7 +5,7 @@
 	при вызове из себя же
   ]] --
 
-local currentMail, totalCount, totalMoney, lastMoney, lastAttach = 0, 0, 0, 0;
+local currentMail, totalCount, totalMoney, lastMoney, attachIndex, lastItemCount = 0, 0, 0, 0,0;
 local slotsExists = true;
 local inprogress = false;
 local chosen = "all"
@@ -19,6 +19,7 @@ waitframe:Hide();
 waitframe:SetScript("OnShow", function(self)
     self.timer = 0.5;
 end)
+
 waitframe:SetScript("OnUpdate", function(self, elapsed)
     self.timer = self.timer - elapsed;
     if (self.timer < 0) then
@@ -27,9 +28,13 @@ waitframe:SetScript("OnUpdate", function(self, elapsed)
     end;
 end)
 
+
+
 -- [[ hooking MailFrame ]]--
 hooksecurefunc(MailFrame, "Hide", function()
     if (inprogress) then
+		mailID = 0;
+		waitframe:Hide();
         printMoney(totalMoney)
     end
     inprogress = false;
@@ -37,9 +42,16 @@ hooksecurefunc(MailFrame, "Hide", function()
 end)
 
 hooksecurefunc("InboxFrame_Update", function()
-    local index = ((InboxFrame.pageNum - 1) * INBOXITEMS_TO_DISPLAY);
+    local index = ((InboxFrame.pageNum - 1) * INBOXITEMS_TO_DISPLAY)
+	local count = GetInboxNumItems() 
     for i = 1, 7 do
-        _G["MailItem" .. i].checkBox:SetChecked(selectedID[index + i] == 1);
+		local cb = _G["MailItem" .. i].checkBox
+		if ((index + i) <= count) then 		
+			cb:Show()
+		else 
+			cb:Hide() 
+		end		
+        cb:SetChecked(selectedID[index + i] == 1)
     end
 end)
 
@@ -53,9 +65,10 @@ mailButton:SetScript("OnClick", function()
         chosen = UIDropDownMenu_GetText(PostalMailTypes)
 
         inprogress = true;
-        currentMail, totalMoney, lastMoney, lastAttach, totalCount = 0, 0, 0, 0, 0;
-        mailID, _ = GetInboxNumItems();
+        currentMail, totalMoney, lastMoney = 0, 0, 0
+		attachIndex, lastItemCount, totalCount = 0, 0, 0
 
+        mailID, _ = GetInboxNumItems();
         print("you got " .. mailID .. " letters in your box")
         getAllMail();
     end
@@ -63,19 +76,20 @@ end)
 
 function getAllMail()
     if mailID > 0 then
-        local sender, subj, msgMoney, CODAmount, _, msgItemCount = select(3, GetInboxHeaderInfo(mailID))
-
+        local sender, subj, msgMoney, CODAmount, _, msgItemCount = select(3, GetInboxHeaderInfo(mailID))		
         if ((msgItemCount or msgMoney > 0) and (checkAH(sender) or checkSelected() or checkAll())) then
             if (CODAmount == 0) then
             -- looting if there are no COD
-                if ((lastMoney > 0 and lastMoney == msgMoney) or lastAttach == msgItemCount) then
+                if ((lastMoney > 0 and lastMoney == msgMoney) or lastItemCount == msgItemCount) then
                 -- wait longer cos money has not been looted yet
                     return waitframe:Show();
                 end
 
                 if (currentMail ~= mailID) then
                     print("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
-                    totalCount = totalCount + 1;
+					attachIndex = ATTACHMENTS_MAX_RECEIVE  -- sometimes attachments have index with gaps, i.e. [1]=ore [2]=egg [3]=nil [4]=ore
+					lastItemCount = msgItemCount
+                    totalCount = totalCount + 1
                     currentMail = mailID
                 end
 
@@ -87,16 +101,25 @@ function getAllMail()
                 end
 
                 if (msgItemCount and slotsExists) then
-                    local itemLink = GetInboxItemLink(msgItemCount)
+					while not GetInboxItemLink(mailID, attachIndex) and attachIndex > 0 do
+							attachIndex = attachIndex - 1 
+					end		
+					if (attachIndex == 0 and msgItemCount) then
+						print(string.format("Letter with index %d subj '%s' is broken. Skipped.", mailID, subj))
+						mailID = mailID - 1;
+                        getAllMail();
+					end
+					
+                    local itemLink = GetInboxItemLink(mailID, attachIndex)
                     if (getFreeInventoryNum(itemLink) > 0) then
-                        lastAttach = msgItemCount
-                        TakeInboxItem(mailID, msgItemCount);
+                        lastItemCount = msgItemCount
+                        TakeInboxItem(mailID, attachIndex);
                         return waitframe:Show();
                     else
                         print("no more room in inventory, items will be skipped.")
                         slotsExists = false;
                         mailID = mailID - 1;
-                        return getAllMail();
+                        getAllMail();
                     end
                 end
             else
@@ -105,13 +128,15 @@ function getAllMail()
                 getAllMail();
             end
         else
-            lastAttach = 0;
+            lastItemCount = 0;
             lastMoney = 0;
             mailID = mailID - 1;
             getAllMail();
         end
     else
+		waitframe:Hide()
         inprogress = false;
+		clearSelectedID()
         printMoney(totalMoney)
     end
 end
@@ -127,16 +152,11 @@ function checkAH(sender)
 end
 
 function checkSelected()
-    if (chosen == "selected") then
-        local result = (selectedID[mailID]) and (selectedID[mailID] ~= 0)
-        selectedID[mailID] = 0
-        return result;
-    end
-    return false
+    return (chosen == "selected")  and  selectedID[mailID] and (selectedID[mailID] ~= 0)
 end
 
 function checkAll()
-    return chosen == "all"
+    return (chosen == "all")
 end
 
 function getMoneyString(gold, silver, copper)

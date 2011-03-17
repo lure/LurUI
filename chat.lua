@@ -73,7 +73,7 @@ local real_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
 function ChatFrame_OnHyperlinkShow(self, link, text, button)
   local urltype, urllink = link:match("(%a+):(.+)")
 
-  if (urltype == URLCONST) then
+  if (urltype == URLCONST and "RightButton" == button) then
     local popup = StaticPopup_Show("CHAT_LINK")
     popup.editBox:SetText(urllink)
     popup.editBox:HighlightText()

@@ -3,6 +3,7 @@ local _G = getfenv(0)
 local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%]+"
 local channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h"
 local URLCONST = "URL"
+local COPYCONST="|Hlcopy|h%s|h %s"
 
 -- doesnt work: no pcre compatible regular expressions
 -- local pattern = "((www|ftp|mailto|https|callto)\://)?(www\.)?[\d\w-_/\.]+\.[\w\d]+"
@@ -62,26 +63,40 @@ local function formChannelName(text, modif)
 	end
 end
 
+local function ShowPopup(text)
+    local popup = StaticPopup_Show("CHAT_LINK")
+    popup.editBox:SetText(text)
+    popup.editBox:HighlightText()
+    popup.editBox:SetFocus()
+end
+
 local function hook_addMessage(self, text, ...)  
   local fomattedText = text:gsub(channelPattern, formChannelName)
   fomattedText = fomattedText:gsub(urlPattern, formUrlLink)
-  self:old_addMessage(date("%H:%M:%S") .. " " .. fomattedText, ...)
+  fomattedText = COPYCONST:format(date("%H:%M:%S"), fomattedText)
+  self:old_addMessage(fomattedText, ...)
 end
 
 -- source: http://wowprogramming.com/utils/xmlbrowser/diff/FrameXML/ChatFrame.xml
 local real_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
+
 function ChatFrame_OnHyperlinkShow(self, link, text, button)
   local urltype, urllink = link:match("(%a+):(.+)")
-
   if (urltype == URLCONST) then
-    local popup = StaticPopup_Show("CHAT_LINK")
-    popup.editBox:SetText(urllink)
-    popup.editBox:HighlightText()
-    popup.editBox:SetFocus()
+    ShowPopup(urllink)
+  elseif (link == "lcopy") then
+    local hyperbutton = GetMouseFocus(); 
+	if (hyperbutton:IsObjectType("HyperLinkButton")) then
+		local _, fontstring = hyperbutton:GetPoint(1)
+		if(fontstring:IsObjectType("FontString")) then 			
+			ShowPopup(fontstring:GetText())		
+		end		
+	end
   else
     real_OnHyperlinkShow(self, link, text, button)
   end
 end
+
 
 
 for i = 1, NUM_CHAT_WINDOWS do
@@ -91,3 +106,6 @@ for i = 1, NUM_CHAT_WINDOWS do
     frame.AddMessage = hook_addMessage
   end
 end
+
+
+-- [[ thanks to Borlox, who proved my guesses ]] -- 

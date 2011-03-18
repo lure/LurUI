@@ -82,6 +82,7 @@ local real_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
 
 function ChatFrame_OnHyperlinkShow(self, link, text, button)
   local urltype, urllink = link:match("(%a+):(.+)")
+<<<<<<< HEAD
   if (urltype == URLCONST) then
     ShowPopup(urllink)
   elseif (link == "lcopy") then
@@ -92,6 +93,14 @@ function ChatFrame_OnHyperlinkShow(self, link, text, button)
 			ShowPopup(fontstring:GetText())		
 		end		
 	end
+=======
+
+  if (urltype == URLCONST and "RightButton" == button) then
+    local popup = StaticPopup_Show("CHAT_LINK")
+    popup.editBox:SetText(urllink)
+    popup.editBox:HighlightText()
+    popup.editBox:SetFocus()
+>>>>>>> c6ab41cc1caf535669d10b91dd0c4403543d0eba
   else
     real_OnHyperlinkShow(self, link, text, button)
   end

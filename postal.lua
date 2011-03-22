@@ -4,13 +4,21 @@
 	если вызывается из фрейма - значит не ждать, а брать вещь и вызывать себя же
 	при вызове из себя же
   ]] --
+  
+local postal={}
+  
+-- control variables
+local lastMail, lastMoney, lastItemCount, attachIndex = 0, 0, 0, 0,0
+local mailID, lastMailCount = 0, 0
 
-local currentMail, totalCount, totalMoney, lastMoney, attachIndex, lastItemCount = 0, 0, 0, 0,0;
-local slotsExists = true;
-local inprogress = false;
+--statistic
+local totalCount, totalMoney = 0, 0
+
+-- behaviour variables 
+local slotsExists = true
+local inprogress = false
 local chosen = "all"
 local selectedID = {}
-local mailID = 0;
 
 
 -- [[ WaitForSingleObject from ThreadAPI imitation ]] --
@@ -62,35 +70,54 @@ mailButton:SetPoint("TOPRIGHT", -41, -41)
 mailButton:SetText("Get mail")
 mailButton:SetScript("OnClick", function()
     if (not inprogress) then
+        inprogress = true;
         chosen = UIDropDownMenu_GetText(PostalMailTypes)
 
-        inprogress = true;
-        currentMail, totalMoney, lastMoney = 0, 0, 0
+        mailID, _ = GetInboxNumItems()		
+        ShowMessage("you got " .. mailID .. " letters in your box")
+		
+        lastMail, totalMoney, lastMoney = 0, 0, 0
 		attachIndex, lastItemCount, totalCount = 0, 0, 0
-
-        mailID, _ = GetInboxNumItems();
-        print("you got " .. mailID .. " letters in your box")
+		lastMailCount = 0 
+		
         getAllMail();
     end
 end)
 
 function getAllMail()
+	-- special part for "selected" mail
+	if (mailID > 0 and checkSelected() and (lastMailCount ~= GetInboxNumItems())) then
+		-- this is not the first iteration, so we have to go one letter down, because 
+		-- disappeared letter made previous one going down 
+		if (lastMailCount ~= 0) then
+			selectedID[mailID] = 0		
+			mailID = mailID - 1
+		end
+				
+		-- listing ID while it is not selected one
+		while (selectedID[mailID] ~= 1 and mailID > 0) do
+			mailID = mailID - 1 
+		end			
+	end
+		
     if mailID > 0 then
-        local sender, subj, msgMoney, CODAmount, _, msgItemCount = select(3, GetInboxHeaderInfo(mailID))		
+		local sender, subj, msgMoney, CODAmount, _, msgItemCount = select(3, GetInboxHeaderInfo(mailID))
         if ((msgItemCount or msgMoney > 0) and (checkAH(sender) or checkSelected() or checkAll())) then
             if (CODAmount == 0) then
             -- looting if there are no COD
-                if ((lastMoney > 0 and lastMoney == msgMoney) or lastItemCount == msgItemCount) then
+                if ((lastMail == mailID) and letterIsNotFinished()) then
                 -- wait longer cos money has not been looted yet
+					ShowMessage("waiting longer")
                     return waitframe:Show();
                 end
 
-                if (currentMail ~= mailID) then
-                    print("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
+                if (lastMail ~= mailID) then
+					lastMailCount = GetInboxNumItems()
+                    ShowMessage("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
 					attachIndex = ATTACHMENTS_MAX_RECEIVE  -- sometimes attachments have index with gaps, i.e. [1]=ore [2]=egg [3]=nil [4]=ore
 					lastItemCount = msgItemCount
                     totalCount = totalCount + 1
-                    currentMail = mailID
+                    lastMail = mailID
                 end
 
                 if (msgMoney > 0) then
@@ -102,12 +129,11 @@ function getAllMail()
 
                 if (msgItemCount and slotsExists) then
 					while not GetInboxItemLink(mailID, attachIndex) and attachIndex > 0 do
-							attachIndex = attachIndex - 1 
+						attachIndex = attachIndex - 1 
 					end		
 					if (attachIndex == 0 and msgItemCount) then
-						print(string.format("Letter with index %d subj '%s' is broken. Skipped.", mailID, subj))
-						mailID = mailID - 1;
-                        getAllMail();
+						ShowMessage(string.format("Letter with index %d subj '%s' is broken and skipped.", mailID, subj))
+						return nextLetter()
 					end
 					
                     local itemLink = GetInboxItemLink(mailID, attachIndex)
@@ -116,22 +142,18 @@ function getAllMail()
                         TakeInboxItem(mailID, attachIndex);
                         return waitframe:Show();
                     else
-                        print("no more room in inventory, items will be skipped.")
+                        ShowMessage("no more room in inventory, items will be skipped.")
                         slotsExists = false;
-                        mailID = mailID - 1;
-                        getAllMail();
+						return nextLetter()
                     end
                 end
             else
-                print("This letter contains COD for " .. parseMoney(CODAmount) .. ". So we skipped it")
-                mailID = mailID - 1;
-                getAllMail();
+                ShowMessage("This letter contains COD for " .. parseMoney(CODAmount) .. ". So we skipped it")
+                return nextLetter()
             end
         else
-            lastItemCount = 0;
-            lastMoney = 0;
-            mailID = mailID - 1;
-            getAllMail();
+			selectedID[mailID] = 0
+			return nextLetter()
         end
     else
 		waitframe:Hide()
@@ -141,17 +163,32 @@ function getAllMail()
     end
 end
 
+function ShowMessage(...)
+	print(...)
+end
+
+function letterIsNotFinished()
+	return ((lastMoney > 0 and lastMoney == msgMoney) or (lastItemCount > 0 and lastItemCount == msgItemCount))
+end
+
+function nextLetter()
+	lastItemCount = 0;
+	lastMoney = 0;
+	mailID = mailID - 1;
+	getAllMail();
+end
+
 function printMoney(money)
-    print("POSTAL: Total amount = [ " .. getMoneyString(parseMoney(money)) .. " ], total letters = " .. totalCount)
+    ShowMessage("POSTAL: Total amount = [ " .. getMoneyString(parseMoney(money)) .. " ], total letters = " .. totalCount)
 end
 
 -- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)
 function checkAH(sender)
     return (chosen == "auction") and
-            (GetInboxInvoiceInfo(mailID) ~= nil or (sender:match("^Аукционный дом.+") ~= nil))
+            (GetInboxInvoiceInfo(mailID) ~= nil or (sender and sender:match("^Аукционный дом.+") ~= nil))
 end
 
-function checkSelected()
+function checkSelected() 
     return (chosen == "selected")  and  selectedID[mailID] and (selectedID[mailID] ~= 0)
 end
 
@@ -195,7 +232,8 @@ for i = 1, 7 do
             self:SetChecked(false)
             return;
         end
-        selectedID[_G["MailItem" .. i .. "Button"].index] = self:GetChecked() and 1 or 0
+		-- _G["MailItem" .. i .. "Button"].index
+        selectedID[index] = self:GetChecked() and 1 or 0
     end)
     mailItemFrame.checkBox = checkBox;
 end
@@ -228,3 +266,12 @@ UIDropDownMenu_SetButtonWidth(PostalMailTypes, 124)
 UIDropDownMenu_SetSelectedID(PostalMailTypes, 1)
 UIDropDownMenu_SetText(PostalMailTypes, items["all"])
 UIDropDownMenu_JustifyText(PostalMailTypes, "LEFT")
+
+
+
+--[[ 
+	создаем коллекцию фреймов, содержащих письма, которые нужно собрать
+		1 берем первое письмо по индексу, работаем с ним до тех пор, пока фрейм сохраненный не перстанет быть равным текущему фрему , взятому по индексу 
+		2 как только фреймРабочий~=фрейм[текущий] смещаемся на следующий фрейм
+		3 идти на 1
+]]--

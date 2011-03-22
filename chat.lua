@@ -88,7 +88,7 @@ function ChatFrame_OnHyperlinkShow(self, link, text, button)
     local hyperbutton = GetMouseFocus(); 
 	if (hyperbutton:IsObjectType("HyperLinkButton") and "RightButton" == button) then
 		local _, fontstring = hyperbutton:GetPoint(1)
-		if(fontstring:IsObjectType("FontString")) then 			
+		if(fontstring:IsObjectType("FontString")) then
 			ShowPopup(fontstring:GetText())		
 		end		
 	end

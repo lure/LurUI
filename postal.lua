@@ -5,7 +5,9 @@
 	при вызове из себя же
   ]] --
   
-local postal={}
+local postal={
+-- move all variables here !! 
+}
   
 -- control variables
 local lastMail, lastMoney, lastItemCount, attachIndex = 0, 0, 0, 0,0

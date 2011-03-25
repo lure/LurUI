@@ -115,7 +115,7 @@ function getAllMail()
 					lastMailCount = GetInboxNumItems()
                     ShowMessage("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
 					attachIndex = ATTACHMENTS_MAX_RECEIVE  -- sometimes attachments have index with gaps, i.e. [1]=ore [2]=egg [3]=nil [4]=ore
-					lastItemCount = msgItemCount
+					lastItemCount = (msgItemCount) and msgItemCount or 0
                     totalCount = totalCount + 1
                     lastMail = mailID
                 end

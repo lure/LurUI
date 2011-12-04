@@ -1,6 +1,13 @@
-﻿-- adds timestamp to every string except combat log 
+﻿--[[ 
+* adds timestamp
+* shortens channel names
+* shows popup windows by right-click on timestamp in order to copy chat string
+* replace url most of them) with link, which shows popup window on click
+P.S.: thanks to Borlox, who proved my guesses 
+]]-- 
+
 local _G = getfenv(0)
-local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&]+"
+local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+"
 local channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h"
 local URLCONST = "URL"
 local COPYCONST="|Hlcopy|h%s|h %s"
@@ -107,5 +114,3 @@ for i = 1, NUM_CHAT_WINDOWS do
   end
 end
 
-
--- [[ thanks to Borlox, who proved my guesses ]] -- 

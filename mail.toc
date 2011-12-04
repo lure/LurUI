@@ -1,4 +1,4 @@
-## Interface: 40000
+## Interface: 40300
 ## Title: |cffee00ffMail|r
 ## Notes: Handful of useful addons.
 ## Version: 1.0.3

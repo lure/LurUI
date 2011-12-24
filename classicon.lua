@@ -1,4 +1,8 @@
---http://us.blizzard.com/support/article.xml?locale=en_US&articleId=21466&pageNumber=1&searchQuery=Blizzard+Interface
+--[[
+* Adds small class icon near the target portret. 
+* http://us.blizzard.com/support/article.xml?locale=en_US&articleId=21466&pageNumber=1&searchQuery=Blizzard+Interface
+]]--
+
 local lurui = {}
 lurui.targetClassFrame = CreateFrame("Frame", "classicon", TargetFrame)
 local f = lurui.targetClassFrame

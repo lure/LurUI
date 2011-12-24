@@ -198,16 +198,7 @@ function checkAll()
     return (chosen == "all")
 end
 
-function getMoneyString(gold, silver, copper)
-    return string.format("%dg %ds %dc", gold, silver, copper)
-end
 
-function parseMoney(money)
-    local msgGold = math.floor(money / 10000)
-    local msgSilver = math.floor((money - msgGold * 10000) / 100)
-    local msgCopper = money - (msgGold * 10000) - (msgSilver * 100)
-    return msgGold, msgSilver, msgCopper;
-end
 
 function clearSelectedID()
     for i = 1, INBOXITEMS_TO_DISPLAY do

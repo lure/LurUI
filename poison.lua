@@ -30,7 +30,7 @@ function notify(existsEnchant, duration)
     duration = existsEnchant and math.floor(duration / 600) / 100 or 0
 
     if (duration < Poison.time) then
-        ChatFrame1:AddMessage("expires too early, in " .. duration, Poison.color.r, Poison.color.g, Poison.color.b)
+        ChatFrame1:AddMessage("poison expires too early, in " .. duration, Poison.color.r, Poison.color.g, Poison.color.b)
     end
 end
 

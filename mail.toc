@@ -9,7 +9,13 @@ core.lua
 postal.lua
 map.lua
 poison.lua
+
+antispam.lua
 chat.lua
+
 classicon.lua
---testframe.xml
 selljunk.lua
+
+
+
+--testframe.xml

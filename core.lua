@@ -1,11 +1,16 @@
 ﻿--[[ 
-
+	core functionality. Some functions and definitions. 
 ]] --
 
 --ReloadUI
 SlashCmdList.MAILRELOADUI = ReloadUI
 SLASH_MAILRELOADUI1, SLASH_MAILRELOADUI2 = '/кд', '/rl'
 
+local LURUI_GLOBAL = "LurUI"
+local lurui = _G[LURUI_GLOBAL]
+if not lurui then 
+	_G[LURUI_GLOBAL] = {func={}}
+end
 
 function getFreeInventoryNum(bagtype)
   local commonbag, specificbag = 0, 0;
@@ -52,4 +57,8 @@ function makeFrameMovable(frame)
   frame:SetScript("OnDragStop", function(self, button)
     self:StopMovingOrSizing();
   end)
+end
+
+LurUI.func.trim = function(s)
+  return s:match "^%s*(.-)%s*$"
 end

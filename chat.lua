@@ -6,15 +6,14 @@
 P.S.: thanks to Borlox, who proved my guesses 
 ]]-- 
 
+
 local _G = getfenv(0)
+-- Approach below doesnt work: no pcre compatible regular expressions
+-- local pattern = "((www|ftp|mailto|https|callto)\://)?(www\.)?[\d\w-_/\.]+\.[\w\d]+"
 local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+"
 local channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h"
 local URLCONST = "URL"
 local COPYCONST="|Hlcopy|h%s|h %s"
-
--- doesnt work: no pcre compatible regular expressions
--- local pattern = "((www|ftp|mailto|https|callto)\://)?(www\.)?[\d\w-_/\.]+\.[\w\d]+"
-
 
 -- adding my EditPopupDialog to global table
 -- http://www.wowwiki.com/Creating_simple_pop-up_dialog_boxes
@@ -31,7 +30,8 @@ StaticPopupDialogs["CHAT_LINK"] = {
   hideOnEscape = true,
 }
 
-local SHORTAGE = {
+LurUI.chat = {}
+LurUI.chat.SHORTAGE = {
 	["channel:1"] = "1",
 	["channel:2"] = "2",
 	["channel:3"] = "3",
@@ -64,20 +64,21 @@ end
 local function formChannelName(text, modif)
   -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
 	-- print(text.." "..modif)
-	local value = SHORTAGE[modif] and SHORTAGE[modif] or SHORTAGE[text]
+	local shortage = LurUI.chat.SHORTAGE;
+	local value = shortage[modif] and shortage[modif] or shortage[text]
 	if (value ~= nil) then
 		return string.format("|Hchannel:%s|h[%s]|h", text, value)
 	end
 end
 
-local function ShowPopup(text)
+LurUI.chat.ShowPopup = function(text)
     local popup = StaticPopup_Show("CHAT_LINK")
     popup.editBox:SetText(text)
     popup.editBox:HighlightText()
     popup.editBox:SetFocus()
 end
 
-local function hook_addMessage(self, text, ...)  
+local function hook_addMessage(self, text, ...) 
   local fomattedText = text:gsub(channelPattern, formChannelName)
   fomattedText = fomattedText:gsub(urlPattern, formUrlLink)
   fomattedText = COPYCONST:format(date("%H:%M:%S"), fomattedText)
@@ -90,13 +91,13 @@ local real_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
 function ChatFrame_OnHyperlinkShow(self, link, text, button)
   local urltype, urllink = link:match("(%a+):(.+)")
   if (urltype == URLCONST) then
-    ShowPopup(urllink)
+    LurUI.chat.ShowPopup (urllink)
   elseif (link == "lcopy") then
     local hyperbutton = GetMouseFocus(); 
 	if (hyperbutton:IsObjectType("HyperLinkButton") and "RightButton" == button) then
 		local _, fontstring = hyperbutton:GetPoint(1)
 		if(fontstring:IsObjectType("FontString")) then
-			ShowPopup(fontstring:GetText())		
+			LurUI.chat.ShowPopup (fontstring:GetText())		
 		end		
 	end
   else

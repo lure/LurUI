@@ -4,6 +4,7 @@
 ]] --
 LurUI.antispam = {}
 LurUI.antispam.spamtable = {}
+LurUI.antispam.TIMEDELTA = 120  -- time in seconds
 LurUI.antispam.frame = CreateFrame("Frame")
 LurUI.antispam.frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 LurUI.antispam.frame.ZONE_CHANGED_NEW_AREA = function(self, ...)
@@ -20,9 +21,9 @@ local function hook_addMessage(self, text, ...)
 		local msg = text:match("]|h: (.+)") or text:match("|r]|h кричит: (.+)")	
 		if msg then 
 			msg = LurUI:trim(msg)
-			local current = date("%H%M%S")
+			local current = time()
 			local value = LurUI.antispam.spamtable[msg]
-			if (not value) or ((current-value) > 120) then
+			if (not value) or ((current-value) > LurUI.antispam.TIMEDELTA) then
 				LurUI.antispam.spamtable[msg] = current
 				self:LurUI_ASAddMessage(text, ...)
 			end		

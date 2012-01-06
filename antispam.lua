@@ -16,23 +16,22 @@ end)
 -- /run table.foreach(LurUI.antispam.spamtable, print)
 -- нужна хешмэп, где ключ это [час:минута], а значение - карта (key=реплика)
 LurUI.antispam.hook = function(self, text, ...)
-	--self:LurUI_ASAddMessage(text, ...) --text:gsub("|","||")
-	local n = select('#', ...)
-	local t = {...}
+	--self:LurUI_ASAddMessage(text:gsub("|","||"), ...) 
+
+	local msg = text:match("]|h: (.+)") or text:match(":YELL|h")
 	
-	local channelMsg = false
-	text:gsub("]|h: (.+)", function(w)
-		w = LurUI.func.trim(w)
-		channelMsg = true
+	if msg then 
+		msg = LurUI:trim(msg)
 		local current = date("%H%M%S")
-		local value = LurUI.antispam.spamtable[w]
+		local value = LurUI.antispam.spamtable[msg]
 		
-		if (not value) or ((current-value) > 60) then
-			LurUI.antispam.spamtable[w] = current
-			self:LurUI_ASAddMessage(text, unpack(t, 1, n))
+		if (not value) or ((current-value) > 120) then
+			LurUI.antispam.spamtable[msg] = current
+			self:LurUI_ASAddMessage(text, ...)
 		end		
-	end)
-	if (not channelMsg) then 
+	end	
+	
+	if not msg then 
 		self:LurUI_ASAddMessage(text, ...)
 	end
 

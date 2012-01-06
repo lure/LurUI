@@ -5,14 +5,9 @@
 --ReloadUI
 SlashCmdList.MAILRELOADUI = ReloadUI
 SLASH_MAILRELOADUI1, SLASH_MAILRELOADUI2 = '/кд', '/rl'
+LurUI = {}
 
-local LURUI_GLOBAL = "LurUI"
-local lurui = _G[LURUI_GLOBAL]
-if not lurui then 
-	_G[LURUI_GLOBAL] = {func={}}
-end
-
-function getFreeInventoryNum(bagtype)
+function LurUI:getFreeInventoryNum(bagtype)
   local commonbag, specificbag = 0, 0;
 
   for bag = 0, NUM_BAG_SLOTS do
@@ -32,12 +27,17 @@ function getFreeInventoryNum(bagtype)
 end
 
 --[[ Forms a string with a '4g 3s 12c' format ]]--
-function getMoneyString(gold, silver, copper)
+function LurUI:formMoneyString(gold, silver, copper)
     return string.format("%dg %ds %dc", gold, silver, copper)
 end
 
+--[[ 2 in 1 : parses amount and formats money string for output]]--
+function LurUI:moneyToString(money) 
+	return LurUI:formMoneyString(LurUI:parseMoney(money))
+end
+
 --[[ parses copper to copper, silver and gold ]]--
-function parseMoney(money)
+function LurUI:parseMoney(money)
     local msgGold = math.floor(money / 10000)
     local msgSilver = math.floor((money - msgGold * 10000) / 100)
     local msgCopper = money - (msgGold * 10000) - (msgSilver * 100)
@@ -45,7 +45,7 @@ function parseMoney(money)
 end
 
 --[[ makes any frame movable ]]--
-function makeFrameMovable(frame)
+function LurUI:makeFrameMovable(frame)
   frame:RegisterForDrag("LeftButton", "RightButton")
   frame:EnableMouse(true)
   frame:SetMovable(true)
@@ -59,6 +59,6 @@ function makeFrameMovable(frame)
   end)
 end
 
-LurUI.func.trim = function(s)
+function LurUI:trim(s)
   return s:match "^%s*(.-)%s*$"
 end

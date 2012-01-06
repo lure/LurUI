@@ -5,10 +5,6 @@
 	при вызове из себя же
   ]] --
   
-local postal={
--- move all variables here !! 
-}
-  
 -- control variables
 local lastMail, lastMoney, lastItemCount, attachIndex = 0, 0, 0, 0,0
 local mailID, lastMailCount = 0, 0
@@ -115,7 +111,7 @@ function getAllMail()
 
                 if (lastMail ~= mailID) then
 					lastMailCount = GetInboxNumItems()
-                    ShowMessage("Processing: " .. subj .. " " .. getMoneyString(parseMoney(msgMoney)))
+                    ShowMessage("Processing: " .. subj .. " " .. LurUI:moneyToString(msgMoney))
 					attachIndex = ATTACHMENTS_MAX_RECEIVE  -- sometimes attachments have index with gaps, i.e. [1]=ore [2]=egg [3]=nil [4]=ore
 					lastItemCount = (msgItemCount) and msgItemCount or 0
                     totalCount = totalCount + 1
@@ -139,7 +135,7 @@ function getAllMail()
 					end
 					
                     local itemLink = GetInboxItemLink(mailID, attachIndex)
-                    if (getFreeInventoryNum(itemLink) > 0) then
+                    if (LurUI:getFreeInventoryNum(itemLink) > 0) then
                         lastItemCount = msgItemCount
                         TakeInboxItem(mailID, attachIndex);
                         return waitframe:Show();
@@ -150,7 +146,7 @@ function getAllMail()
                     end
                 end
             else
-                ShowMessage("This letter contains COD for " .. parseMoney(CODAmount) .. ". So we skipped it")
+                ShowMessage("This letter contains COD for " .. moneyToString(CODAmount) .. ". So we skipped it")
                 return nextLetter()
             end
         else
@@ -181,7 +177,7 @@ function nextLetter()
 end
 
 function printMoney(money)
-    ShowMessage("POSTAL: Total amount = [ " .. getMoneyString(parseMoney(money)) .. " ], total letters = " .. totalCount)
+    ShowMessage("POSTAL: Total amount = [ " .. LurUI:moneyToString(money) .. " ], total letters = " .. totalCount)
 end
 
 -- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)

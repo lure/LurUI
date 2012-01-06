@@ -1,4 +1,8 @@
-﻿--[[  Poison remainder  ]]
+﻿--[[
+Poison remainder  
+Every time zone is changed and enchantment duration on main or offhand weapon is less than specific time 
+message appears in the first chat window.  Nothing special, but yellow color brings attention 
+]]
 
 if (select(2, UnitClass("player")) ~= "ROGUE") then return end;
 
@@ -21,16 +25,16 @@ frame.ZONE_CHANGED_NEW_AREA = function(self, ...)
     pvpType, _, _ = GetZonePVPInfo()
     --if(pvpType == 'arena') then
     local hasMainHandEnchant, mainHandExpiration, _, hasOffHandEnchant, offHandExpiration, _ = GetWeaponEnchantInfo()
-    notify(hasMainHandEnchant, mainHandExpiration)
-    notify(hasOffHandEnchant, offHandExpiration)
+    notify("mainhand", hasMainHandEnchant, mainHandExpiration)
+    notify("offhand", hasOffHandEnchant, offHandExpiration)
 --end
 end
 
-function notify(existsEnchant, duration)
+function notify(hand, existsEnchant, duration)
     duration = existsEnchant and math.floor(duration / 600) / 100 or 0
 
     if (duration < Poison.time) then
-        ChatFrame1:AddMessage("poison expires too early, in " .. duration, Poison.color.r, Poison.color.g, Poison.color.b)
+        ChatFrame1:AddMessage(hand .. "poison expires too early, in " .. duration, Poison.color.r, Poison.color.g, Poison.color.b)
     end
 end
 

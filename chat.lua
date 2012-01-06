@@ -3,17 +3,8 @@
 * shortens channel names
 * shows popup windows by right-click on timestamp in order to copy chat string
 * replace url most of them) with link, which shows popup window on click
-P.S.: thanks to Borlox, who proved my guesses 
+* P.S.: thanks to Borlox, who proved my guesses 
 ]]-- 
-
-
-local _G = getfenv(0)
--- Approach below doesnt work: no pcre compatible regular expressions
--- local pattern = "((www|ftp|mailto|https|callto)\://)?(www\.)?[\d\w-_/\.]+\.[\w\d]+"
-local urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+"
-local channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h"
-local URLCONST = "URL"
-local COPYCONST="|Hlcopy|h%s|h %s"
 
 -- adding my EditPopupDialog to global table
 -- http://www.wowwiki.com/Creating_simple_pop-up_dialog_boxes
@@ -30,7 +21,15 @@ StaticPopupDialogs["CHAT_LINK"] = {
   hideOnEscape = true,
 }
 
-LurUI.chat = {}
+LurUI.chat = {
+	urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+",
+	channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h",
+	channelTemplate = "|Hchannel:%s|h[%s]|h",
+	URLCONST = "URL",
+	URLTEMPLATE = "|cffffd000|H%s:%s|h%s|h|r",
+	COPYCONST="|Hlcopy|h%s|h %s"
+}
+
 LurUI.chat.SHORTAGE = {
 	["channel:1"] = "1",
 	["channel:2"] = "2",
@@ -58,7 +57,7 @@ LurUI.chat.SHORTAGE = {
 
 -- converts "http://ya.ru" to {@link http://www.wowwiki.com/ItemLink}
 local function formUrlLink(text)
-  return string.format("|cffffd000|H%s:%s|h%s|h|r", URLCONST, text, text)
+  return string.format(LurUI.chat.URLTEMPLATE, LurUI.chat.URLCONST, text, text)
 end
 
 local function formChannelName(text, modif)
@@ -67,7 +66,7 @@ local function formChannelName(text, modif)
 	local shortage = LurUI.chat.SHORTAGE;
 	local value = shortage[modif] and shortage[modif] or shortage[text]
 	if (value ~= nil) then
-		return string.format("|Hchannel:%s|h[%s]|h", text, value)
+		return string.format(LurUI.chat.channelTemplate, text, value)
 	end
 end
 
@@ -79,9 +78,9 @@ LurUI.chat.ShowPopup = function(text)
 end
 
 local function hook_addMessage(self, text, ...) 
-  local fomattedText = text:gsub(channelPattern, formChannelName)
-  fomattedText = fomattedText:gsub(urlPattern, formUrlLink)
-  fomattedText = COPYCONST:format(date("%H:%M:%S"), fomattedText)
+  local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
+  fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
+  fomattedText = LurUI.chat.COPYCONST:format(date("%H:%M:%S"), fomattedText)
   self:old_addMessage(fomattedText, ...)
 end
 
@@ -90,7 +89,7 @@ local real_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
 
 function ChatFrame_OnHyperlinkShow(self, link, text, button)
   local urltype, urllink = link:match("(%a+):(.+)")
-  if (urltype == URLCONST) then
+  if (urltype == LurUI.chat.URLCONST) then
     LurUI.chat.ShowPopup (urllink)
   elseif (link == "lcopy") then
     local hyperbutton = GetMouseFocus(); 

@@ -6,16 +6,11 @@
 ## SavedVariablesPerCharacter: lurui
 
 core.lua
-postal.lua
 map.lua
 poison.lua
-
 antispam.lua
 chat.lua
-
 classicon.lua
+postal.lua
 selljunk.lua
-
-
-
 --testframe.xml

@@ -2,11 +2,13 @@
 * Adds a button "sell junk" to every merchant window. 
 * Pressing tat button playr are able to sell all grey-quality items from his backpacks
 ]]--
-local lurui = {
+LurUI.SellJunk = {
 	vendorAvailable		= false,
 	amount 				= 0,
 	count				= 0
-}
+	}
+local lurui = LurUI.SellJunk
+local RESUMETEMPLATE = "SELLJUNK: Sold %s item(s) for %s"
 
 local function sellJunk()
    lurui.count = 0
@@ -32,7 +34,8 @@ local function sellJunk()
 			end
 		end	
 	end
-	print("Sold "..lurui.count.." stack(s) for "..getMoneyString(parseMoney(lurui.amount)))
+	
+	print(RESUMETEMPLATE:format(lurui.count, LurUI:moneyToString(lurui.amount)))
 end
 
 -- [[ hooking MailFrame ]]--

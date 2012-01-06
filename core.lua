@@ -1,5 +1,7 @@
 ﻿--[[ 
 	core functionality. Some functions and definitions. 
+	
+	P.S.:/script DEFAULT_CHAT_FRAME:AddMessage( GetMouseFocus():GetName() );
 ]] --
 
 --ReloadUI

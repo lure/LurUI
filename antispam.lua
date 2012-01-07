@@ -1,6 +1,5 @@
 --[[ 
 	blocks repeating messages, allowing it appear with 1 min interval. 
-	if not anti then return end
 ]] --
 LurUI.antispam = {}
 LurUI.antispam.spamtable = {}

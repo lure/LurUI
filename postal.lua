@@ -104,7 +104,7 @@ function getAllMail()
             if (CODAmount == 0) then
             -- looting if there are no COD
                 if ((lastMail == mailID) and letterIsNotFinished()) then
-                -- wait longer cos money has not been looted yet
+					-- wait longer cos money has not been looted yet
 					ShowMessage("waiting longer")
                     return waitframe:Show();
                 end

@@ -45,10 +45,12 @@ frame.LurUI_ASAddMessage=frame.AddMessage
 frame.AddMessage = hook_addMessage
 
 local function myChatFilter(self, event, msg, author, ...)
-	if author == LurUI.antispam.player then 
-		return false, msg, author, ... 
-	end
 	
+	--if author == LurUI.antispam.player then
+		print(false, msg, author, ...)
+		return false, event, msg, author, ... 
+	--end
+	--[[
 	local text = msg:gsub("%s", "")
 	local current = time()
 	local value = LurUI.antispam.spamtable[text]
@@ -59,8 +61,9 @@ local function myChatFilter(self, event, msg, author, ...)
 	else 
 		return true
 	end
+	]]--
 end
--- ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", myChatFilter)
+--ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", myChatFilter)
 --ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", myChatFilter)
 --ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", myChatFilter)
 

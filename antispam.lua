@@ -27,15 +27,19 @@ local function hook_addMessage(self, text, ...)
 	if text:match("|Hchannel:channel") or text:match(":YELL|h") then 		
 		local msg = text:match("]|h: (.+)") or text:match(YELLPATTERN)	
 		if msg then 
-			msg = msg:gsub("%s",""):upper() -- removing any spaces and make it upper case 
+			msg = msg:gsub("%W","") -- removing any spaces 
+			msg = msg:gsub("|T%S+|t", "") -- removing raid target icons
+			msg = msg:upper()  -- uppercase it
+			
 			local current = time()
 			local value = LurUI.antispam.spamtable[msg]
 			if (not value) or ((current-value) > LurUI.antispam.TIMEDELTA) then
 				LurUI.antispam.spamtable[msg] = current
-				self:LurUI_ASAddMessage(text, ...)
+				local txt = text:gsub("|T%S+|t", "")
+				self:LurUI_ASAddMessage(txt, ...)
 			end		
 		end	
-	else 
+	else		
 		self:LurUI_ASAddMessage(text, ...)			
 	end
 end

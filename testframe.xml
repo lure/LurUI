@@ -1,16 +1,36 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
+<!-- 
+<Frame enableMouse="true">
+ <Size x="100" y="100"/>
+ <TitleRegion>
+  <Size x="100" y="20"/>
+  <Anchors><Anchor point="TOP"/></Anchors>
+ </TitleRegion>
 
-    <Frame
-           name="myTabContainerFrame"
-           toplevel="true"
-           frameStrata="DIALOG"
-           movable="true"
-           enableMouse="true"
-           hidden="false"
-           parent="UIParent">
+ <Layers>
+  <Layer level="ARTWORK">
+   <Texture setAllPoints="true">
+    <Color r="1.0" g="0.5" b="0.0" a="0.5" />
+   </Texture>
+  </Layer>
+ </Layers>
+ <Anchors><Anchor point="CENTER" relativeTo="UIParent"/></Anchors>
+</Frame>
+
+
+		    <Scripts>
+				<OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
+				<OnDragStart>self:StartMoving();</OnDragStart>
+				<OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+			</Scripts>
+-->			
+			
+   <Frame name="myTabContainerFrame" toplevel="true" frameStrata="DIALOG" movable="true"
+           enableMouse="true" hidden="true" parent="UIParent"> 
+							   <TitleRegion setAllPoints="true"/> 
            <Size>
-               <AbsDimension x="480" y="325"/>
+               <AbsDimension x="200" y="200"/>
            </Size>
            <Anchors>
                <Anchor point="CENTER">
@@ -31,7 +51,7 @@
                    <AbsValue val="32"/>
                </EdgeSize>
            </Backdrop>
-           <Layers>
+           <Layers>		 
                <Layer level="ARTWORK">
                    <Texture name="myFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
                        <Size>
@@ -54,9 +74,8 @@
                            </Anchor>
                        </Anchors>
                    </FontString>
-               </Layer>
+               </Layer>  
            </Layers>
-
-       </Frame>
+		</Frame>
 
 </Ui>

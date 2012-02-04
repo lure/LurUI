@@ -1,0 +1,16 @@
+## Interface: 40300
+## Title: |cffee00fflurui|r
+## Notes: Handful of useful addons.
+## Version: 1.0.3
+## Author: Lure
+## SavedVariablesPerCharacter: lurui
+
+core.lua
+map.lua
+poison.lua
+antispam.lua
+chat.lua
+classicon.lua
+postal.lua
+selljunk.lua
+testframe.xml

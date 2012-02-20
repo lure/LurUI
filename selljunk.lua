@@ -48,7 +48,7 @@ hooksecurefunc(MerchantFrame, "Hide", function()
    lurui.amount= 0
 end)
 
-SellButton = CreateFrame("Button", nil, MerchantFrame, "OptionsButtonTemplate")
+local SellButton = CreateFrame("Button", nil, MerchantFrame, "OptionsButtonTemplate")
 SellButton:SetPoint("TOPRIGHT", -42, -48)
 SellButton:SetText("Sell junk")
 SellButton:SetScript("OnClick", function()

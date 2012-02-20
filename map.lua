@@ -8,18 +8,7 @@ coord:SetHeight(10)
 coord:SetWidth(400)
 coord:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE, MONOCHROME")
 
-
-WorldMapFrame:HookScript("OnUpdate", function(self, button)
-        local px, py = roundCoords(GetPlayerMapPosition("player"))
-		local mx, my = GetMouseCoord()
-        mx = mx > 0 and string.format("%02.1f", mx) or "00.0"
-        my = my > 0 and  string.format("%02.1f", my)  or "00.0"
-        local playerCoords = string.format("you = %02.1f / %02.1f mouse = %s / %s", px, py, mx, my)
-		coord:SetText(playerCoords)
-    end)
-
-	
-function GetMouseCoord()
+local function GetMouseCoord()
 	local scale = WorldMapDetailFrame:GetEffectiveScale()
 	local width = WorldMapDetailFrame:GetWidth()
 	local height = WorldMapDetailFrame:GetHeight()
@@ -39,11 +28,21 @@ function GetMouseCoord()
 	return adjustedX, adjustedY
 end
 
-
-function roundCoords(varx, vary)
+local function roundCoords(varx, vary)
 	varx = math.floor(varx * 1000 + 0.5)/10
 	vary = math.floor(vary * 1000 + 0.5)/10	
 	return varx, vary
 end
+
+WorldMapFrame:HookScript("OnUpdate", function(self, button)
+        local px, py = roundCoords(GetPlayerMapPosition("player"))
+		local mx, my = GetMouseCoord()
+        mx = mx > 0 and string.format("%02.1f", mx) or "00.0"
+        my = my > 0 and  string.format("%02.1f", my)  or "00.0"
+        local playerCoords = string.format("you = %02.1f / %02.1f mouse = %s / %s", px, py, mx, my)
+		coord:SetText(playerCoords)
+    end)	
+
+
 
 

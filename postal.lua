@@ -18,7 +18,6 @@ local inprogress = false
 local chosen = "all"
 local selectedID = {}
 
-
 -- [[ WaitForSingleObject from ThreadAPI imitation ]] --
 local waitframe = CreateFrame("Frame", nil, UIParent)
 waitframe:Hide();
@@ -30,59 +29,46 @@ waitframe:SetScript("OnUpdate", function(self, elapsed)
     self.timer = self.timer - elapsed;
     if (self.timer < 0) then
         self:Hide();
-        getAllMail()
+        self:getAllMail();
     end;
 end)
 
+local function letterIsNotFinished()
+	return ((lastMoney > 0 and lastMoney == msgMoney) or (lastItemCount > 0 and lastItemCount == msgItemCount))
+end
 
+local function nextLetter()
+	lastItemCount = 0;
+	lastMoney = 0;
+	mailID = mailID - 1;
+	waitframe:getAllMail();
+end
 
--- [[ hooking MailFrame ]]--
-hooksecurefunc(MailFrame, "Hide", function()
-    if (inprogress) then
-		mailID = 0;
-		waitframe:Hide();
-        printMoney(totalMoney)
+local function ShowMessage(...)
+	print(...)
+end
+
+local function printMoney(money)
+    print("POSTAL: Total amount = [ " .. LurUI:moneyToString(money) .. " ], total letters = " .. totalCount)
+end
+
+-- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)
+local function checkAH(sender)
+    return (chosen == "auction") and
+            (GetInboxInvoiceInfo(mailID) ~= nil or (sender and sender:match("^Аукционный дом.+") ~= nil))
+end
+
+local function checkSelected() 
+    return (chosen == "selected") and selectedID[mailID] and (selectedID[mailID] ~= 0)
+end
+
+local function clearSelectedID()
+    for i = 1, INBOXITEMS_TO_DISPLAY do
+        selectedID[i] = 0
     end
-    inprogress = false;
-    clearSelectedID()
-end)
+end
 
-hooksecurefunc("InboxFrame_Update", function()
-    local index = ((InboxFrame.pageNum - 1) * INBOXITEMS_TO_DISPLAY)
-	local count = GetInboxNumItems() 
-    for i = 1, 7 do
-		local cb = _G["MailItem" .. i].checkBox
-		if ((index + i) <= count) then 		
-			cb:Show()
-		else 
-			cb:Hide() 
-		end		
-        cb:SetChecked(selectedID[index + i] == 1)
-    end
-end)
-
-
--- [[ adding a button to MailFrame ]] --
-mailButton = CreateFrame("Button", nil, InboxFrame, "OptionsButtonTemplate")
-mailButton:SetPoint("TOPRIGHT", -41, -41)
-mailButton:SetText("Get mail")
-mailButton:SetScript("OnClick", function()
-    if (not inprogress) then
-        inprogress = true;
-        chosen = UIDropDownMenu_GetText(PostalMailTypes)
-
-        mailID, _ = GetInboxNumItems()		
-        ShowMessage("you got " .. mailID .. " letters in your box")
-		
-        lastMail, totalMoney, lastMoney = 0, 0, 0
-		attachIndex, lastItemCount, totalCount = 0, 0, 0
-		lastMailCount = 0 
-		
-        getAllMail();
-    end
-end)
-
-function getAllMail()
+function waitframe:getAllMail()
 	-- special part for "selected" mail
 	if (mailID > 0 and checkSelected() and (lastMailCount ~= GetInboxNumItems())) then
 		-- this is not the first iteration, so we have to go one letter down, because 
@@ -100,7 +86,7 @@ function getAllMail()
 		
     if mailID > 0 then
 		local sender, subj, msgMoney, CODAmount, _, msgItemCount = select(3, GetInboxHeaderInfo(mailID))
-        if ((msgItemCount or msgMoney > 0) and (checkAH(sender) or checkSelected() or checkAll())) then
+        if ((msgItemCount or msgMoney > 0) and (checkAH(sender) or checkSelected() or (chosen == "all"))) then
             if (CODAmount == 0) then
             -- looting if there are no COD
                 if ((lastMail == mailID) and letterIsNotFinished()) then
@@ -161,49 +147,28 @@ function getAllMail()
     end
 end
 
-function ShowMessage(...)
-	print(...)
-end
+-- [[ adding a button to MailFrame ]] --
+local mailButton = CreateFrame("Button", nil, InboxFrame, "OptionsButtonTemplate")
+mailButton:SetPoint("TOPRIGHT", -41, -41)
+mailButton:SetText("Get mail")
+mailButton:SetScript("OnClick", function()
+    if (not inprogress) then
+        inprogress = true;
+        chosen = UIDropDownMenu_GetText(PostalMailTypes)
 
-function letterIsNotFinished()
-	return ((lastMoney > 0 and lastMoney == msgMoney) or (lastItemCount > 0 and lastItemCount == msgItemCount))
-end
-
-function nextLetter()
-	lastItemCount = 0;
-	lastMoney = 0;
-	mailID = mailID - 1;
-	getAllMail();
-end
-
-function printMoney(money)
-    ShowMessage("POSTAL: Total amount = [ " .. LurUI:moneyToString(money) .. " ], total letters = " .. totalCount)
-end
-
--- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)
-function checkAH(sender)
-    return (chosen == "auction") and
-            (GetInboxInvoiceInfo(mailID) ~= nil or (sender and sender:match("^Аукционный дом.+") ~= nil))
-end
-
-function checkSelected() 
-    return (chosen == "selected")  and  selectedID[mailID] and (selectedID[mailID] ~= 0)
-end
-
-function checkAll()
-    return (chosen == "all")
-end
-
-
-
-function clearSelectedID()
-    for i = 1, INBOXITEMS_TO_DISPLAY do
-        selectedID[i] = 0
+        mailID, _ = GetInboxNumItems()		
+        ShowMessage("you got " .. mailID .. " letters in your box")
+		
+        lastMail, totalMoney, lastMoney = 0, 0, 0
+		attachIndex, lastItemCount, totalCount = 0, 0, 0
+		lastMailCount = 0 
+		
+        waitframe:getAllMail();
     end
-end
+end)
 
 -- [[ DROP DOWN MENU ]] --
--- moving MailItemFrames to the right by 20px. Some lines below they are shortened by that 20px
+-- moving MailItemFrames to the right by 20px. All MailItems below are shortened by the same 20px
 _G["MailItem1"]:SetPoint("TOPLEFT", 48, -80)
 
 -- adding checkbox
@@ -227,7 +192,6 @@ for i = 1, 7 do
     mailItemFrame.checkBox = checkBox;
 end
 
-
 local items = {
     ["all"] = "all",
     ["auction"] = "auction",
@@ -245,7 +209,6 @@ local function initialize(self, level)
     end
 end
 
-
 -- Adding the button  http://wowprogramming.com/forums/development/159
 local mailType = CreateFrame("Frame", "PostalMailTypes", InboxFrame, "UIDropDownMenuTemplate")
 mailType:SetPoint("TOPRIGHT", -120, -39)
@@ -256,7 +219,30 @@ UIDropDownMenu_SetSelectedID(PostalMailTypes, 1)
 UIDropDownMenu_SetText(PostalMailTypes, items["all"])
 UIDropDownMenu_JustifyText(PostalMailTypes, "LEFT")
 
+-- [[ hooking MailFrame ]]--
+hooksecurefunc(MailFrame, "Hide", function()
+    if (inprogress) then
+		mailID = 0;
+		waitframe:Hide();
+        printMoney(totalMoney)
+    end
+    inprogress = false;
+    clearSelectedID()
+end)
 
+hooksecurefunc("InboxFrame_Update", function()
+    local index = ((InboxFrame.pageNum - 1) * INBOXITEMS_TO_DISPLAY)
+	local count = GetInboxNumItems() 
+    for i = 1, 7 do
+		local cb = _G["MailItem" .. i].checkBox
+		if ((index + i) <= count) then 		
+			cb:Show()
+		else 
+			cb:Hide() 
+		end		
+        cb:SetChecked(selectedID[index + i] == 1)
+    end
+end)
 
 --[[ 
 	создаем коллекцию фреймов, содержащих письма, которые нужно собрать

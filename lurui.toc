@@ -3,7 +3,6 @@
 ## Notes: Handful of useful addons.
 ## Version: 1.0.3
 ## Author: Lure
-## SavedVariablesPerCharacter: lurui
 
 core.lua
 map.lua

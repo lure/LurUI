@@ -12,6 +12,7 @@ Poison.time = 15; -- acceptable time to expire
 
 local frame = CreateFrame("Frame", "PoisonRemainderFrame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("MERCHANT_SHOW")
 
 frame.PLAYER_ENTERING_WORLD = function(self, ...)
     local _, classFileName = UnitClass("player")
@@ -41,3 +42,19 @@ end
 frame:SetScript("OnEvent", function(self, event, ...)
     self[event](self, ...)
 end)
+
+local poisonName = "яд"
+frame.MERCHANT_SHOW = function(self, ... )
+	for index = 1,GetMerchantNumItems() do 
+		local nm = GetMerchantItemInfo(index)
+		if (nm and nm:find(poisonName)) then 
+			local count = 20 - GetItemCount(nm, nil, true)
+			if count>0 then BuyMerchantItem(index, count) end
+		end
+	end
+end
+
+
+
+
+

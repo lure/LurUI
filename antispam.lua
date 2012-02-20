@@ -27,7 +27,7 @@ local function hook_addMessage(self, text, ...)
 	if text:match("|Hchannel:channel") or text:match(":YELL|h") then 		
 		local msg = text:match("]|h: (.+)") or text:match(YELLPATTERN)	
 		if msg then 
-			msg = msg:gsub("%W","") -- removing any spaces 
+			msg = msg:gsub("[%s%c%z%p]","") -- removing any spaces %W does not work as WoW LUA doesn't support UTF8
 			msg = msg:gsub("|T%S+|t", "") -- removing raid target icons
 			msg = msg:upper()  -- uppercase it
 			

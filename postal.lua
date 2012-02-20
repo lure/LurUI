@@ -29,7 +29,7 @@ waitframe:SetScript("OnUpdate", function(self, elapsed)
     self.timer = self.timer - elapsed;
     if (self.timer < 0) then
         self:Hide();
-        getAllMail()
+        self:getAllMail();
     end;
 end)
 
@@ -41,7 +41,7 @@ local function nextLetter()
 	lastItemCount = 0;
 	lastMoney = 0;
 	mailID = mailID - 1;
-	getAllMail();
+	waitframe:getAllMail();
 end
 
 local function ShowMessage(...)

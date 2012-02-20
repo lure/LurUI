@@ -10,9 +10,9 @@ local function expiration(ref, hand, existsEnchant, duration)
     local e = existsEnchant and math.floor(duration / 600) / 100 or 0     
 	if e < DELTA then
 		if e == 0 then 
-			ref.msg = (ref.msg and ref.msg or "")..hand.." expired "
+			ref.msg = (ref.msg and ref.msg or "").." ["..hand.." expired]"
 		else
-			ref.msg = (ref.msg and ref.msg or "")..hand.." in "..e
+			ref.msg = (ref.msg and ref.msg or "").." ["..hand.." in "..e.."]"
 		end
 	end
 end
@@ -35,7 +35,7 @@ frame.ZONE_CHANGED_NEW_AREA = function(self, ...)
 	expiration(ref, "throw", hasThrownEnchant, thrownExpiration)
 	
 	if (ref.msg) then 
-		ref.msg = "POISONS: expires "..ref.msg
+		ref.msg = "POISONS: expires"..ref.msg
 		ChatFrame1:AddMessage(ref.msg, TEXTCOLOR.r, TEXTCOLOR.g, TEXTCOLOR.b)	
 	end
 end

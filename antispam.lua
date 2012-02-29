@@ -1,79 +1,124 @@
---[[ 
+п»ї--[[ 
 	blocks repeating messages, allowing it appear with 1 min interval. 
 ]] --
-LurUI.antispam = {}
-local player = UnitName("player")
-LurUI.antispam.player = "|Hplayer:"..player..":"
-LurUI.antispam.spamtable = {}
-LurUI.antispam.TIMEDELTA = 120  -- time in seconds
-LurUI.antispam.frame = CreateFrame("Frame")
-LurUI.antispam.frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-LurUI.antispam.frame.ZONE_CHANGED_NEW_AREA = function(self, ...)
+LurUI.antispam = {spamtable = {}, 
+				  TIMEDELTA = 120, 
+				  frame = CreateFrame("Frame"),
+				  player = "|Hplayer:"..UnitName("player")..":",
+				  seen = {},
+				  banned = {},
+				  allowed = {}
+				  }
+local AS = LurUI.antispam
+
+AS.frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+AS.frame:RegisterEvent("FRIENDLIST_UPDATE")
+AS.frame.ZONE_CHANGED_NEW_AREA = function(...)
 	LurUI.antispam.spamtable = {}
 end
-LurUI.antispam.frame:SetScript("OnEvent", function(self, event, ...)
-    self[event](self, ...)
+
+AS.frame:SetScript("OnEvent", function(self, event, ...)
+    self[event](...)
 end)
 
-local YELLPATTERN = CHAT_YELL_GET:format("|r]|h").."(.+)" --"|r]|h кричит: (.+)"
+local YELLPATTERN = CHAT_YELL_GET:format("|r]|h").."(.+)" --"|r]|h РєСЂРёС‡РёС‚: (.+)"
 
 -- Here we maintain the hashmap where key is a text and value - it's timestamp.
 -- copy this to chat to see stored messages /run table.foreach(LurUI.antispam.spamtable, print) 
 local function hook_addMessage(self, text, ...)
-	if text:match(LurUI.antispam.player) then 
-		self:LurUI_ASAddMessage(text, ...)	
+	if text:match(AS.player) then 
+		self:LurUI_AddMessage(text, ...)	
 		return 
 	end
 	if text:match("|Hchannel:channel") or text:match(":YELL|h") then 		
 		local msg = text:match("]|h: (.+)") or text:match(YELLPATTERN)	
 		if msg then 
+			msg = msg:gsub("|T.+|t", "") -- removing raid target icons
 			msg = msg:gsub("[%s%c%z%p]","") -- removing any spaces %W does not work as WoW LUA doesn't support UTF8
-			msg = msg:gsub("|T%S+|t", "") -- removing raid target icons
 			msg = msg:upper()  -- uppercase it
 			
 			local current = time()
-			local value = LurUI.antispam.spamtable[msg]
-			if (not value) or ((current-value) > LurUI.antispam.TIMEDELTA) then
-				LurUI.antispam.spamtable[msg] = current
+			local value = AS.spamtable[msg]
+			if (not value) or ((current-value) > AS.TIMEDELTA) then
+				AS.spamtable[msg] = current
 				local txt = text:gsub("|T%S+|t", "")
-				self:LurUI_ASAddMessage(txt, ...)
+				self:LurUI_AddMessage(txt, ...)
 			end		
 		end	
 	else		
-		self:LurUI_ASAddMessage(text, ...)			
+		self:LurUI_AddMessage(text, ...)			
 	end
 end
 
 local frame = _G["ChatFrame1"]
-frame.LurUI_ASAddMessage=frame.AddMessage
+frame.LurUI_AddMessage=frame.AddMessage
 frame.AddMessage = hook_addMessage
 
-local function myChatFilter(self, event, msg, author, ...)
-	
-	--if author == LurUI.antispam.player then
-		print(false, msg, author, ...)
-		return false, event, msg, author, ... 
-	--end
-	--[[
-	local text = msg:gsub("%s", "")
-	local current = time()
-	local value = LurUI.antispam.spamtable[text]
-	if (not value) or ((current - value.timestamp) > LurUI.antispam.TIMEDELTA) then
-		LurUI.antispam.spamtable[text].timestamp = current
-		LurUI.antispam.spamtable[text].frame = self:GetName()
-		return false, msg, author, ... 
-	else 
-		return true
+--[[ SPAM REMOVER ]]--
+AS.frame.FRIENDLIST_UPDATE= function(...) 
+	for index=1, GetNumFriends() do 
+		local name, level = GetFriendInfo(index)
+		if AS.seen[name] then
+			RemoveFriend(name)			
+			if (level < 10) then 
+				AS.banned[name] = ""
+			end
+			AS.allowed[name] = level -- no real reason to save it here, but why not?
+		end
 	end
-	]]--
 end
---ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", myChatFilter)
---ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", myChatFilter)
---ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", myChatFilter)
+local function myChatFilter(self, event, msg, author, ...)
+	if (AS.banned[author]) then 
+		return true
+	elseif (AS.allowed[author]) then 
+		return false, msg, author, ...
+	end
+	
+	local level = UnitLevel(author)
+	if (level ~= 0) then
+		if (level < 10) then 
+			for index=1, GetNumFriends() do
+				local name = GetFriendInfo(index)
+				if name == author then 
+					return false, msg, author, ... 
+				end
+			end
+			AS.banned[author] = ""
+		elseif (level > 10) then 
+			return false, msg, author, ...
+		end
+	else
+		if not AS.seen[author] then 		
+			AS.seen[author]=""
+			AddFriend(author)
+		end
+		return false, msg, author, ...
+	end
+end
 
+local function myErrorFilter(self, event, msg, author, ...)
+	-- no need to form special string and guess about string declision!!! 'format' from wow lua does it automatically 	
+	for k in pairs(AS.seen) do	
+		if msg == format(ERR_FRIEND_ADDED_S, k) then
+			return true
+		end 	
 
-
-
+		if msg == format(ERR_FRIEND_REMOVED_S, k) then 
+			AS.seen[k] = nil
+			return true
+		end 
+	end
+	return false, msg, author, ...
 --[[
-|Hlcopy|h01:45:04|h |Hchannel:channel:4|h[4]|h |Hplayer:Онеоне:817:CHANNEL:4|h[|cff0070ddОнеоне|r]|h: |TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|t|TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|tВ статик ДД10 3\8 Хм (рт пн-чт с 20.45-00) нид: ШП 390+ил - вступление в гильдию(25лвл) |TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|t™
+	for i,k in pairs(LurUI.antispam.banned) do print(i) end	
+	for i,k in pairs(LurUI.antispam.seen) do print(i) end	
+]]--
+end
+
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", myChatFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", myErrorFilter)
+--ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", myChatFilter)
+--[[
+|Hlcopy|h01:45:04|h |Hchannel:channel:4|h[4]|h |Hplayer:РћРЅРµРѕРЅРµ:817:CHANNEL:4|h[|cff0070ddРћРЅРµРѕРЅРµ|r]|h: |TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|t|TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|tР’ СЃС‚Р°С‚РёРє Р”Р”10 3\8 РҐРј (СЂС‚ РїРЅ-С‡С‚ СЃ 20.45-00) РЅРёРґ: РЁРџ 390+РёР» - РІСЃС‚СѓРїР»РµРЅРёРµ РІ РіРёР»СЊРґРёСЋ(25Р»РІР») |TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|tв„ў
 ]]--

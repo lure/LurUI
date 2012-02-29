@@ -35,7 +35,7 @@ local function sellJunk()
 		end	
 	end
 	
-	print(RESUMETEMPLATE:format(lurui.count, LurUI:moneyToString(lurui.amount)))
+	print(RESUMETEMPLATE:format(lurui.count, GetCoinTextureString(lurui.amount)))
 end
 
 -- [[ hooking MailFrame ]]--

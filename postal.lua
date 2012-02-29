@@ -49,7 +49,7 @@ local function ShowMessage(...)
 end
 
 local function printMoney(money)
-    print("POSTAL: Total amount = [ " .. LurUI:moneyToString(money) .. " ], total letters = " .. totalCount)
+    print("POSTAL: Total amount = [ " .. GetCoinTextureString(money) .. " ], total letters = " .. totalCount)
 end
 
 -- true if (only  H letters are permitted and this one is from AH) or (any letters are permitted)

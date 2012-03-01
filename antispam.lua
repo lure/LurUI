@@ -7,13 +7,15 @@ LurUI.antispam = {spamtable = {},
 				  player = "|Hplayer:"..UnitName("player")..":",
 				  seen = {},
 				  banned = {},
-				  allowed = {}
+				  allowed = {},
+				  isBattleField = false
 				  }
 local AS = LurUI.antispam
 
 AS.frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 AS.frame:RegisterEvent("FRIENDLIST_UPDATE")
 AS.frame.ZONE_CHANGED_NEW_AREA = function(...)
+	LurUI.antispam.isBattlefield = GetNumBattlefieldStats() > 0
 	LurUI.antispam.spamtable = {}
 end
 
@@ -26,6 +28,7 @@ local YELLPATTERN = CHAT_YELL_GET:format("|r]|h").."(.+)" --"|r]|h кричит:
 -- Here we maintain the hashmap where key is a text and value - it's timestamp.
 -- copy this to chat to see stored messages /run table.foreach(LurUI.antispam.spamtable, print) 
 local function hook_addMessage(self, text, ...)
+
 	if text:match(AS.player) then 
 		self:LurUI_AddMessage(text, ...)	
 		return 
@@ -55,6 +58,10 @@ frame.LurUI_AddMessage=frame.AddMessage
 frame.AddMessage = hook_addMessage
 
 --[[ SPAM REMOVER ]]--
+for index=1, GetNumFriends() do
+	local name, level = GetFriendInfo(index)
+	AS.allowed[name] = level
+end	
 AS.frame.FRIENDLIST_UPDATE= function(...) 
 	for index=1, GetNumFriends() do 
 		local name, level = GetFriendInfo(index)
@@ -68,6 +75,10 @@ AS.frame.FRIENDLIST_UPDATE= function(...)
 	end
 end
 local function myChatFilter(self, event, msg, author, ...)
+	if AS.isBattleField then
+		return false, msg, author, ...
+	end 
+	
 	if (AS.banned[author]) then 
 		return true
 	elseif (AS.allowed[author]) then 
@@ -96,8 +107,11 @@ local function myChatFilter(self, event, msg, author, ...)
 	end
 end
 
+-- no need to form special string and guess about string declision!!! 'format' from wow lua does it automatically 	
 local function myErrorFilter(self, event, msg, author, ...)
-	-- no need to form special string and guess about string declision!!! 'format' from wow lua does it automatically 	
+	--if msg == ERR_FRIEND_NOT_FOUND and AS.seen
+	
+	--end
 	for k in pairs(AS.seen) do	
 		if msg == format(ERR_FRIEND_ADDED_S, k) then
 			return true
@@ -109,16 +123,14 @@ local function myErrorFilter(self, event, msg, author, ...)
 		end 
 	end
 	return false, msg, author, ...
---[[
-	for i,k in pairs(LurUI.antispam.banned) do print(i) end	
-	for i,k in pairs(LurUI.antispam.seen) do print(i) end	
-]]--
 end
-
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", myChatFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", myErrorFilter)
---ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", myChatFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", myChatFilter)
 --[[
+ERR_FRIEND_NOT_FOUND	
+/run for i,k in pairs(LurUI.antispam.banned) do print(i) end	
+/run for i,k in pairs(LurUI.antispam.seen) do print(i) end	
 |Hlcopy|h01:45:04|h |Hchannel:channel:4|h[4]|h |Hplayer:Онеоне:817:CHANNEL:4|h[|cff0070ddОнеоне|r]|h: |TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|t|TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|tВ статик ДД10 3\8 Хм (рт пн-чт с 20.45-00) нид: ШП 390+ил - вступление в гильдию(25лвл) |TInterface\TargetingFrame\UI-RaidTargetingIcon_1:0|t™
 ]]--

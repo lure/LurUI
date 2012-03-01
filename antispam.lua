@@ -75,7 +75,7 @@ AS.frame.FRIENDLIST_UPDATE= function(...)
 	end
 end
 local function myChatFilter(self, event, msg, author, ...)
-	if AS.isBattleField then
+	if #author=0 or AS.isBattleField then
 		return false, msg, author, ...
 	end 
 	
@@ -109,9 +109,10 @@ end
 
 -- no need to form special string and guess about string declision!!! 'format' from wow lua does it automatically 	
 local function myErrorFilter(self, event, msg, author, ...)
-	--if msg == ERR_FRIEND_NOT_FOUND and AS.seen
 	
-	--end
+	if msg == ERR_FRIEND_NOT_FOUND and next(AS.seen) then --note that next(table)  result may be wrongly intrepreted for table[false] = "someval"
+		return true
+	end
 	for k in pairs(AS.seen) do	
 		if msg == format(ERR_FRIEND_ADDED_S, k) then
 			return true

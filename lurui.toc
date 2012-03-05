@@ -7,7 +7,7 @@
 core.lua
 map.lua
 poison.lua
-antispam.lua
+
 chat.lua
 classicon.lua
 postal.lua

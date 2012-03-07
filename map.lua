@@ -2,12 +2,10 @@
 	Adds player's coordinates to the map
 ]]--
 local coordMouse = WorldMapFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-coordMouse:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 200, 11)
-coordMouse:SetHeight(10)
+coordMouse:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 300, 9)
 coordMouse:SetJustifyH("LEFT")
 local coordPlayer = WorldMapFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-coordPlayer:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 320, 11)
-coordPlayer:SetHeight(10)
+coordPlayer:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 420, 9)
 coordPlayer:SetJustifyH("LEFT")
 
 

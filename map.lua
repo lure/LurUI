@@ -1,10 +1,15 @@
 --[[ 	
 	Adds player's coordinates to the map
 ]]--
-local coord = WorldMapFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-coord:SetPoint("BOTTOMRIGHT", WorldMapPositioningGuide, "BOTTOMRIGHT", -400, 11)
-coord:SetHeight(10)
-coord:SetWidth(400)
+local coordMouse = WorldMapFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+coordMouse:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 200, 11)
+coordMouse:SetHeight(10)
+coordMouse:SetJustifyH("LEFT")
+local coordPlayer = WorldMapFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+coordPlayer:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 320, 11)
+coordPlayer:SetHeight(10)
+coordPlayer:SetJustifyH("LEFT")
+
 
 local function GetMouseCoord()
 	local scale = WorldMapDetailFrame:GetEffectiveScale()
@@ -35,8 +40,8 @@ end
 WorldMapFrame:HookScript("OnUpdate", function(self, button)
         local px, py = roundCoords(GetPlayerMapPosition("player"))
 		local mx, my = GetMouseCoord()
-        local playerCoords = string.format("mouse = %04.1f / %04.1f you = %04.1f / %04.1f", mx, my,px, py)
-		coord:SetText(playerCoords)
+		coordMouse:SetText(string.format("mouse = %04.1f / %04.1f", mx, my))
+		coordPlayer:SetText(string.format("you = %04.1f / %04.1f", px, py))
     end)	
 
 

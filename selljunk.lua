@@ -10,7 +10,18 @@ LurUI.SellJunk = {
 local lurui = LurUI.SellJunk
 local RESUMETEMPLATE = "SELLJUNK: Sold %s item(s) for %s"
 
-local function sellJunk()
+-- [[ hooking MailFrame ]]--
+hooksecurefunc(MerchantFrame, "Show", function()
+   lurui.vendorAvailable = true;
+end)
+hooksecurefunc(MerchantFrame, "Hide", function()
+   lurui.vendorAvailable = false;
+end)
+
+local SellButton = CreateFrame("Button", nil, MerchantFrame, "OptionsButtonTemplate")
+SellButton:SetPoint("TOPRIGHT", -42, -48)
+SellButton:SetText("Sell junk")
+SellButton:SetScript("OnClick", function()
    lurui.count = 0
    lurui.amount= 0
 	
@@ -36,23 +47,4 @@ local function sellJunk()
 	end
 	
 	print(RESUMETEMPLATE:format(lurui.count, GetCoinTextureString(lurui.amount)))
-end
-
--- [[ hooking MailFrame ]]--
-hooksecurefunc(MerchantFrame, "Show", function()
-   lurui.vendorAvailable = true;
 end)
-hooksecurefunc(MerchantFrame, "Hide", function()
-   lurui.vendorAvailable = false;
-   lurui.count = 0
-   lurui.amount= 0
-end)
-
-local SellButton = CreateFrame("Button", nil, MerchantFrame, "OptionsButtonTemplate")
-SellButton:SetPoint("TOPRIGHT", -42, -48)
-SellButton:SetText("Sell junk")
-SellButton:SetScript("OnClick", function()
-	sellJunk()
-end)
-
--- 20:10:47 The escaped link is:  |cff9d9d9d|Hitem:3300:0:0:0:0:0:0:1501976576:47:0|h[Кроличья лапка]|h|r 

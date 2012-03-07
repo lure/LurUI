@@ -3,7 +3,6 @@
 * http://us.blizzard.com/support/article.xml?locale=en_US&articleId=21466&pageNumber=1&searchQuery=Blizzard+Interface
 ]]--
 
-
 LurUI.targetClassFrame = CreateFrame("Frame", "classicon", TargetFrame)
 local f = LurUI.targetClassFrame
 f:SetWidth(32)

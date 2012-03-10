@@ -28,6 +28,10 @@ frame.PLAYER_ENTERING_WORLD = function(self, ...)
 end
 
 frame.ZONE_CHANGED_NEW_AREA = function(self, ...)
+	local _, dungeonType = GetInstanceInfo()
+	if (GetNumBattlefieldStats() == 0) and (GetZonePVPInfo() ~= "arena") and (dungeonType == "none")then 
+		return
+	end
     local hasMainHandEnchant, mainHandExpiration, _, hasOffHandEnchant, offHandExpiration, _, hasThrownEnchant, thrownExpiration, _ = GetWeaponEnchantInfo()
 	local ref = {msg = nil}
 	

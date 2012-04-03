@@ -12,6 +12,6 @@ chat.lua
 classicon.lua
 postal.lua
 selljunk.lua
+wipeitem.lua
 
---wipeitem.lua
 --testframe.xml

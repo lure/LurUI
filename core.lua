@@ -5,8 +5,12 @@
 ]] --
 
 --ReloadUI
-SlashCmdList.MAILRELOADUI = ReloadUI
-SLASH_MAILRELOADUI1, SLASH_MAILRELOADUI2 = '/кд', '/rl'
+SlashCmdList.LURRELOADUI = ReloadUI
+SLASH_LURRELOADUI1, SLASH_LURRELOADUI2 = '/кд', '/rl'
+
+SlashCmdList.LURROLL = function() RandomRoll(1,100) end
+SLASH_LURROLL1 = '/кщдд'
+
 LurUI = {}
 
 function LurUI:getFreeInventoryNum(bagtype)

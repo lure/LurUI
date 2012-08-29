@@ -10,7 +10,7 @@ local lastMail, lastMoney, lastItemCount, attachIndex = 0, 0, 0, 0,0
 local mailID, lastMailCount = 0, 0
 
 --statistic
-local totalCount, totalMoney = 0, 0
+local totalCount, startMoney, totalMoney = 0, 0, 0
 
 -- behaviour variables 
 local slotsExists = true
@@ -143,7 +143,7 @@ function waitframe:getAllMail()
 		waitframe:Hide()
         inprogress = false;
 		clearSelectedID()
-        printMoney(totalMoney)
+        printMoney(GetMoney() - startMoney)
     end
 end
 
@@ -159,7 +159,8 @@ mailButton:SetScript("OnClick", function()
         mailID, _ = GetInboxNumItems()		
         ShowMessage("you got " .. mailID .. " letters in your box")
 		
-        lastMail, totalMoney, lastMoney = 0, 0, 0
+		startMoney = GetMoney() 
+        lastMail, totalMoney, lastMoney = 0, 0, 0, 0
 		attachIndex, lastItemCount, totalCount = 0, 0, 0
 		lastMailCount = 0 
 		
@@ -224,7 +225,7 @@ hooksecurefunc(MailFrame, "Hide", function()
     if (inprogress) then
 		mailID = 0;
 		waitframe:Hide();
-        printMoney(totalMoney)
+        printMoney(GetMoney() - startMoney)
     end
     inprogress = false;
     clearSelectedID()

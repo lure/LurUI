@@ -149,7 +149,7 @@ end
 
 -- [[ adding a button to MailFrame ]] --
 local mailButton = CreateFrame("Button", nil, InboxFrame, "OptionsButtonTemplate")
-mailButton:SetPoint("TOPRIGHT", -41, -41)
+mailButton:SetPoint("TOPRIGHT", -60, -30)
 mailButton:SetText("Get mail")
 mailButton:SetScript("OnClick", function()
     if (not inprogress) then
@@ -212,7 +212,7 @@ end
 
 -- Adding the button  http://wowprogramming.com/forums/development/159
 local mailType = CreateFrame("Frame", "PostalMailTypes", InboxFrame, "UIDropDownMenuTemplate")
-mailType:SetPoint("TOPRIGHT", -120, -39)
+mailType:SetPoint("RIGHT", mailButton, "LEFT", -2, -2)
 UIDropDownMenu_Initialize(PostalMailTypes, initialize)
 UIDropDownMenu_SetWidth(PostalMailTypes, 80);
 UIDropDownMenu_SetButtonWidth(PostalMailTypes, 124)

@@ -18,9 +18,12 @@ hooksecurefunc(MerchantFrame, "Hide", function()
    lurui.vendorAvailable = false;
 end)
 
-local SellButton = CreateFrame("Button", nil, MerchantFrame, "OptionsButtonTemplate")
-SellButton:SetPoint("TOPRIGHT", -42, -48)
+-- Moves localized repair string to bottom a bit
+MerchantRepairText:SetPoint("BOTTOMLEFT", 14, 35)
+local SellButton = CreateFrame("Button", "MerchantFrameSellJunkButton", MerchantFrame, "OptionsButtonTemplate")
+SellButton:SetPoint("TOPRIGHT",  -200, -32)
 SellButton:SetText("Sell junk")
+SellButton:SetWidth(75)
 SellButton:SetScript("OnClick", function()
    lurui.count = 0
    lurui.amount= 0
@@ -48,3 +51,11 @@ SellButton:SetScript("OnClick", function()
 	
 	print(RESUMETEMPLATE:format(lurui.count, GetCoinTextureString(lurui.amount)))
 end)
+--[[
+SellButton:SetMovable(true)
+SellButton:EnableMouse(true)
+SellButton:RegisterForDrag("LeftButton")
+SellButton:SetScript("OnDragStart", MerchantFrameSellJunkButton.StartMoving)
+SellButton:SetScript("OnDragStop", MerchantFrameSellJunkButton.StopMovingOrSizing)
+/run local f=GetMouseFocus() print(f:GetName(), f:GetPoint())
+]]--

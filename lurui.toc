@@ -13,5 +13,5 @@ classicon.lua
 postal.lua
 selljunk.lua
 wipeitem.lua
-
+makemovable.lua
 --testframe.xml

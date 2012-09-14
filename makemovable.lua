@@ -1,33 +1,29 @@
 --[[ 
 SpellBookFrame TOPLEFT nil TOPLEFT 258.99477022264 -73.789704451551
-				point parent-frame point X Y 
 
-PlayerTalentFrame  -
 SpellBookFrame *
 CharacterFrame   *
-AchievementFrame -
 QuestLogFrame  *
-GuildFrame  -
 PVPFrame *
 PVEFrame *
+MerchantFrame *
+GossipFrame  *
+BankFrame *
+
+PlayerTalentFrame  -
+AchievementFrame -
+GuildFrame  -
 PetJournal  -
 EncounterJournal -
 AuctionFrame -
 ClassTrainerFrame -
-MerchantFrame *
-GossipFrame  *
-BankFrame *
 GuildBankFrame -
-
-ToggleCharacter
-ToggleFriendsFrame
-ToggleFriendsPanel
 
 /run point, relativeTo, relativePoint, xOfs, yOfs = GetMouseFocus():GetPoint() print(relativeTo:GetName())
 /run local f=GetMouseFocus() print(f:GetName(), f:GetPoint())
 
-    frameToMove:CreateTitleRegion():SetAllPoints()
-    frameToMove:SetUserPlaced(true)
+frameToMove:CreateTitleRegion():SetAllPoints()
+frameToMove:SetUserPlaced(true)
 ]]--
 
 
@@ -40,13 +36,11 @@ local PARENTPOINT = "BOTTOMLEFT"
 
 local function LM_OnDragStart(self, ...)
 	self:StartMoving(...)
-	self.LM_moving = true
 	self.LM_custom=true
 end
 
 local function LM_OnDragStop(self, ...)
 	self:StopMovingOrSizing(...)
-	self.LM_moving = false;
 	self:LM_SavePosition()
 end
 
@@ -71,9 +65,8 @@ local function LM_OnShow(self, ...)
 end
 
 local function mountFrame(frame)
-	if (frame) then
+	if (frame and (not frame.LM_mounted)) then
 		if (frame ~= WorldFrame) then 
-			print(frame:GetName(), frame:IsUserPlaced())
 			frame:SetMovable(true)
 			frame:EnableMouse(true)
 			frame:RegisterForDrag("LeftButton")
@@ -93,6 +86,7 @@ local function mountFrame(frame)
 			
 			--add save position function pointer
 			frame.LM_SavePosition = LM_SavePosition;
+			frame.LM_mounted = true 
 		else
 			print("Cant make movable WorldFrame - it is base of WoW frames")
 		end
@@ -103,14 +97,15 @@ end
 
 local function mountFrames()
 	local frames = {
-	[SpellBookFrame]=true,
-	[CharacterFrame]=true,
-	[QuestLogFrame]=true,
-	[PVPFrame]=true,
-	[PVEFrame]=true,
-	[MerchantFrame]=true,
-	[GossipFrame]=true,
-	[BankFrame]=true,
+		[SpellBookFrame]=true,
+		[CharacterFrame]=true,
+		[QuestLogFrame]=true,
+		[PVPFrame]=true,
+		[PVEFrame]=true,
+		[MerchantFrame]=true,
+		[GossipFrame]=true,
+		[BankFrame]=true,
+		[FriendsFrame]=true,
 	}
 	
 	for f in pairs(frames) do
@@ -118,19 +113,33 @@ local function mountFrames()
 	end
 end
 
-
-SLASH_LURMOVE1 = '/mv'
-SlashCmdList.LURMOVE = function() 
-mountFrames()
-	--mountFrame(GetMouseFocus())
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:SetScript("OnEvent", function(self, event, ...)
+    self[event](self, ...)
+end)
+frame.PLAYER_ENTERING_WORLD = function(self, ...)
+	mountFrames()
+	hooksecurefunc("PetJournal_LoadUI", function() mountFrame(PetJournalParent) end); 
+	hooksecurefunc("TalentFrame_LoadUI", function() mountFrame(PlayerTalentFrame) end); 
+	hooksecurefunc("EncounterJournal_LoadUI", function() mountFrame(EncounterJournal) end); 
+	hooksecurefunc("AchievementFrame_LoadUI", function() mountFrame(AchievementFrame) end); 
+	hooksecurefunc("GuildFrame_LoadUI", function() mountFrame(GuildFrame) end); 
+	hooksecurefunc("AuctionFrame_LoadUI", function() mountFrame(AuctionFrame) end); 
+	hooksecurefunc("Calendar_LoadUI", function() mountFrame(CalendarFrame) end);
 end
 
 
 
 
 
-
 --[[
+
+ToggleCalendar
+ToggleGlyphFrame
+ToggleGuildFinder
+
+ToggleTimeManager
 
 var result =".";
 var regex = /^Toggle.+/; 

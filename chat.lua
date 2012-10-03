@@ -11,6 +11,7 @@
 -- http://www.wowinterface.com/forums/showthread.php?t=34994
 -- http://wowprogramming.com/utils/xmlbrowser/live/FrameXML/StaticPopup.lua
 StaticPopupDialogs["CHAT_LINK"] = {
+  preferredIndex = STATICPOPUP_NUMDIALOGS,
   text = "'ctrl+c' to copy or 'esc' to exit",
   button1 = "ok",
   hasEditBox=true,

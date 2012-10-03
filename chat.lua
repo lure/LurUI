@@ -11,7 +11,7 @@
 -- http://www.wowinterface.com/forums/showthread.php?t=34994
 -- http://wowprogramming.com/utils/xmlbrowser/live/FrameXML/StaticPopup.lua
 StaticPopupDialogs["CHAT_LINK"] = {
-  preferredIndex = STATICPOPUP_NUMDIALOGS,
+  preferredIndex = 3, -- avoids BlizzardUI glyph taint. http://forums.wowace.com/showthread.php?p=320956
   text = "'ctrl+c' to copy or 'esc' to exit",
   button1 = "ok",
   hasEditBox=true,

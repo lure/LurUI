@@ -19,11 +19,10 @@ end
 
 local frame = CreateFrame("Frame", "PoisonRemainderFrame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-frame:RegisterEvent("MERCHANT_SHOW")
-
 frame.PLAYER_ENTERING_WORLD = function(self, ...)
     if ("ROGUE" == select(2, UnitClass("player"))) then
         self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+		self:RegisterEvent("MERCHANT_SHOW")
     end
 end
 

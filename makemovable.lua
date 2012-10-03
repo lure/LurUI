@@ -1,24 +1,4 @@
 --[[ 
-SpellBookFrame TOPLEFT nil TOPLEFT 258.99477022264 -73.789704451551
-
-SpellBookFrame *
-CharacterFrame   *
-QuestLogFrame  *
-PVPFrame *
-PVEFrame *
-MerchantFrame *
-GossipFrame  *
-BankFrame *
-
-PlayerTalentFrame  -
-AchievementFrame -
-GuildFrame  -
-PetJournal  -
-EncounterJournal -
-AuctionFrame -
-ClassTrainerFrame -
-GuildBankFrame -
-
 /run point, relativeTo, relativePoint, xOfs, yOfs = GetMouseFocus():GetPoint() print(relativeTo:GetName())
 /run local f=GetMouseFocus() print(f:GetName(), f:GetPoint())
 
@@ -26,8 +6,6 @@ frameToMove:CreateTitleRegion():SetAllPoints()
 frameToMove:SetUserPlaced(true)
 ]]--
 
-
---local waitframe = CreateFrame("Frame", nil, UIParent)
 
 -- this is a coordinate constant. Handled frames are always mounted ro UIparent with specifed points
 local FRAMEPOINT  = "TOPLEFT"
@@ -71,7 +49,7 @@ local function mountFrame(frame)
 			frame:EnableMouse(true)
 			frame:RegisterForDrag("LeftButton")
 			frame:SetClampedToScreen(true)
-			-- doesn't really work
+
 			frame:SetUserPlaced(true)
 			frame.ignoreFramePositionManager=true
 			
@@ -90,8 +68,6 @@ local function mountFrame(frame)
 		else
 			print("Cant make movable WorldFrame - it is base of WoW frames")
 		end
-	else		
-		print("Selected frame is nil, sorry")
 	end
 end
 
@@ -121,33 +97,51 @@ end)
 frame.PLAYER_ENTERING_WORLD = function(self, ...)
 	mountFrames()
 	hooksecurefunc("PetJournal_LoadUI", function() mountFrame(PetJournalParent) end); 
-	hooksecurefunc("TalentFrame_LoadUI", function() mountFrame(PlayerTalentFrame) end); 
+	hooksecurefunc("TalentFrame_LoadUI", function() PlayerTalentFrame:CreateTitleRegion():SetAllPoints() --[[PlayerTalentFrame:SetUserPlaced(true)]]  end); 
 	hooksecurefunc("EncounterJournal_LoadUI", function() mountFrame(EncounterJournal) end); 
 	hooksecurefunc("AchievementFrame_LoadUI", function() mountFrame(AchievementFrame) end); 
 	hooksecurefunc("GuildFrame_LoadUI", function() mountFrame(GuildFrame) end); 
 	hooksecurefunc("AuctionFrame_LoadUI", function() mountFrame(AuctionFrame) end); 
 	hooksecurefunc("Calendar_LoadUI", function() mountFrame(CalendarFrame) end);
+	hooksecurefunc("TradeSkillFrame_LoadUI", function() mountFrame(CalendarFrame) end);
+	hooksecurefunc("MacroFrame_LoadUI", function() mountFrame(MacroFrame) end);
 end
 
-
-
-
-
 --[[
+local _LM_Name, _LM_GUID
 
-ToggleCalendar
-ToggleGlyphFrame
-ToggleGuildFinder
+local frm = CreateFrame("Frame")
+frm:RegisterEvent("INSPECT_READY")
+frm:SetScript("OnEvent", function(self, event, ...)
+    self[event](self, ...)
+end)
+frm.INSPECT_READY = function(self, guid)
+	if (guid ==_LM_GUID) then
+		print(_LM_Name, "[", GetInspectSpecialization(_LM_Name), "]")
+		ClearInspectPlayer()
+		_LM_Name = nil
+		_LM_GUID = nil
+	end	
+end
 
-ToggleTimeManager
+frm:SetScript("OnUpdate", function(self, elapsed)
+	if _LM_GUID ~= nil then return end
 
-var result =".";
-var regex = /^Toggle.+/; 
-$(".mw-content-ltr ul li").each(function (){
-    var tx = $(this).text();
-    if(tx.match(regex)){
-		result += tx +"\n";
-    } 
- })
-$(".atflb").append("<textarea>"+result+"</textarea>");
-]]--
+	local guid = UnitGUID("mouseover")
+	if ((guid ~= _LM_GUID) and CanInspect("mouseover")) then		
+		_LM_Name=UnitName("mouseover")
+		_LM_GUID = guid
+		NotifyInspect(_LM_Name)
+	end
+end)
+
+frm:Show()
+
+/dump NotifyInspect("mouseover") 
+/dump GetInspectSpecialization("mouseover")
+
+/dump NotifyInspect("0x07000000036DE5FE") 
+/dump GetInspectSpecialization("0x07000000036DE5FE")
+/dump GetPlayerInfoByGUID("0x07000000036DE5FE")
+"0x07000000036DE5FE"
+]]

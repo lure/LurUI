@@ -95,6 +95,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
     self[event](self, ...)
 end)
 frame.PLAYER_ENTERING_WORLD = function(self, ...)
+	if (1==1) then return end
 	mountFrames()
 	hooksecurefunc("PetJournal_LoadUI", function() mountFrame(PetJournalParent) end); 
 	hooksecurefunc("TalentFrame_LoadUI", function() PlayerTalentFrame:CreateTitleRegion():SetAllPoints() --[[PlayerTalentFrame:SetUserPlaced(true)]]  end); 

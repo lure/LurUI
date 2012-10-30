@@ -1,4 +1,4 @@
-﻿--[[ 
+--[[ 
 * adds timestamp
 * shortens channel names
 * shows popup windows by right-click on timestamp in order to copy chat string
@@ -27,9 +27,10 @@ LurUI.chat = {
 	urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+",
 	channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h",
 	channelTemplate = "|Hchannel:%s|h[%s]|h",
-	URLCONST = "URL",
-	URLTEMPLATE = "|cffffd000|H%s:%s|h%s|h|r",
-	COPYCONST="|Hlcopy|h%s|h %s"
+	URL = "L_URL",
+	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",
+	COPY="L_CPY",
+	COPYTEMPLATE="|HL_CPY|h%s|h %s"
 }
 
 LurUI.chat.SHORTAGE = {
@@ -59,7 +60,7 @@ LurUI.chat.SHORTAGE = {
 
 -- converts "http://ya.ru" to {@link http://www.wowwiki.com/ItemLink}
 local function formUrlLink(text)
-  return string.format(LurUI.chat.URLTEMPLATE, LurUI.chat.URLCONST, text, text)
+  return string.format(LurUI.chat.URLTEMPLATE, text, text)
 end
 
 local function formChannelName(text, modif)
@@ -82,18 +83,20 @@ end
 local function hook_addMessage(self, text, ...) 
   local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
   fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
-  fomattedText = LurUI.chat.COPYCONST:format(date("%H:%M:%S"), fomattedText)
+  fomattedText = LurUI.chat.COPYTEMPLATE:format(date("%H:%M:%S"), fomattedText)
   self:old_addMessage(fomattedText, ...)
 end
 
--- source: http://wowprogramming.com/utils/xmlbrowser/diff/FrameXML/ChatFrame.xml
+--[[ 
+TAINT: http://forums.wowace.com/showthread.php?t=20217
+source: http://wowprogramming.com/utils/xmlbrowser/diff/FrameXML/ChatFrame.xml
 local real_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
 
 function ChatFrame_OnHyperlinkShow(self, link, text, button)
   local urltype, urllink = link:match("(%a+):(.+)")
-  if (urltype == LurUI.chat.URLCONST) then
+  if (urltype == LurUI.chat.URL) then
     LurUI.chat.ShowPopup (urllink)
-  elseif (link == "lcopy") then
+  elseif (link == LurUI.chat.COPY) then
     local hyperbutton = GetMouseFocus(); 
 	if (hyperbutton:IsObjectType("HyperLinkButton") and "RightButton" == button) then
 		local _, fontstring = hyperbutton:GetPoint(1)
@@ -105,14 +108,41 @@ function ChatFrame_OnHyperlinkShow(self, link, text, button)
     real_OnHyperlinkShow(self, link, text, button)
   end
 end
+]]--
 
-
-
-for i = 1, NUM_CHAT_WINDOWS do
-  if (i ~= 2) then
-    local frame = _G["ChatFrame" .. i]
-    frame.old_addMessage = frame.AddMessage
-    frame.AddMessage = hook_addMessage
-  end
+-- we have to hook this function since the default ChatFrame code assumes 
+-- that all links except for player and channel links are valid arguments for this function
+local old = ItemRefTooltip.SetHyperlink 
+function ItemRefTooltip:SetHyperlink(link, ...)
+	local lnk = link:sub(0, 5)
+	if (lnk == LurUI.chat.URL) or (lnk == LurUI.chat.COPY) then
+		return
+	end
+	return old(self, link, ...)
 end
 
+local function LUR_OnHyperlinkClick(self, link, string, button, ...)
+	local linkType = strsplit(":", link)
+	if (linkType == LurUI.chat.URL) then
+		local urltype, urllink = link:match("(%a+):(.+)")
+		LurUI.chat.ShowPopup(urllink)
+	end
+	if (linkType == LurUI.chat.COPY)then
+		local hyperbutton = GetMouseFocus(); 
+		if (hyperbutton:IsObjectType("HyperLinkButton") and "RightButton" == button) then
+			local _, fontstring = hyperbutton:GetPoint(1)
+			if(fontstring:IsObjectType("FontString")) then
+				LurUI.chat.ShowPopup (fontstring:GetText())		
+			end		
+		end
+	end		
+end
+
+for i = 1, NUM_CHAT_WINDOWS do
+	if (i ~= 2) then
+		local frame = _G["ChatFrame" .. i]
+		frame.old_addMessage = frame.AddMessage
+		frame.AddMessage = hook_addMessage		
+		frame:HookScript("OnHyperlinkClick", LUR_OnHyperlinkClick)
+	end
+end

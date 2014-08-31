@@ -10,6 +10,7 @@
 -- http://www.wowwiki.com/Creating_simple_pop-up_dialog_boxes
 -- http://www.wowinterface.com/forums/showthread.php?t=34994
 -- http://wowprogramming.com/utils/xmlbrowser/live/FrameXML/StaticPopup.lua
+local _
 StaticPopupDialogs["CHAT_LINK"] = {
   preferredIndex = 3, -- avoids BlizzardUI glyph taint. http://forums.wowace.com/showthread.php?p=320956 
   --preferredIndex = STATICPOPUP_NUMDIALOGS may be used instead. It defined in BlizzardUI/FrameXML/StaticPopup.lua
@@ -25,12 +26,12 @@ StaticPopupDialogs["CHAT_LINK"] = {
 
 LurUI.chat = {
 	urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+",
-	channelPattern = "^|Hchannel:(%a+:?%d?)|h(%b[])|h",
+	channelPattern = "^|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
 	channelTemplate = "|Hchannel:%s|h[%s]|h",
 	URL = "L_URL",
 	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",
 	COPY="L_CPY",
-	COPYTEMPLATE="|HL_CPY|h%s|h %s"
+	COPYTEMPLATE="|HL_CPY|h %s"
 }
 
 LurUI.chat.SHORTAGE = {
@@ -53,9 +54,12 @@ LurUI.chat.SHORTAGE = {
 	
 	["[Поле боя]"] = "BG",	
 	["[Лидер поля боя]"] = "BGL",
+	["[Лидер подземелья]"] = "RL",
+
 	
 	["RAID"] ="R",
 	["[Лидер рейда]"]="RL",
+	["[Подземелье]"]="D",
 }
 
 -- converts "http://ya.ru" to {@link http://www.wowwiki.com/ItemLink}
@@ -63,10 +67,8 @@ local function formUrlLink(text)
   return string.format(LurUI.chat.URLTEMPLATE, text, text)
 end
 
+local shortage = LurUI.chat.SHORTAGE;
 local function formChannelName(text, modif)
-  -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
-	-- print(text.." "..modif)
-	local shortage = LurUI.chat.SHORTAGE;
 	local value = shortage[modif] and shortage[modif] or shortage[text]
 	if (value ~= nil) then
 		return string.format(LurUI.chat.channelTemplate, text, value)
@@ -81,9 +83,11 @@ LurUI.chat.ShowPopup = function(text)
 end
 
 local function hook_addMessage(self, text, ...) 
+  -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
+  -- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16
   local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
   fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
-  fomattedText = LurUI.chat.COPYTEMPLATE:format(date("%H:%M:%S"), fomattedText)
+  fomattedText = LurUI.chat.COPYTEMPLATE:format(fomattedText)
   self:old_addMessage(fomattedText, ...)
 end
 

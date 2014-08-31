@@ -14,7 +14,7 @@ local _
 StaticPopupDialogs["CHAT_LINK"] = {
   preferredIndex = 3, -- avoids BlizzardUI glyph taint. http://forums.wowace.com/showthread.php?p=320956 
   --preferredIndex = STATICPOPUP_NUMDIALOGS may be used instead. It defined in BlizzardUI/FrameXML/StaticPopup.lua
-  text = "'ctrl+c' to copy or 'esc' to exit",
+  text = "LurUI: 'ctrl+c' to copy or 'esc' to exit",
   button1 = "ok",
   hasEditBox=true,
   editBoxWidth = 350,
@@ -26,12 +26,11 @@ StaticPopupDialogs["CHAT_LINK"] = {
 
 LurUI.chat = {
 	urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+",
-	channelPattern = "^|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
-	channelTemplate = "|Hchannel:%s|h[%s]|h",
+	channelPattern = "^([%d:]*[ AaPpMm]*)|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
+	channelTemplate = "|HL_CPY|h%s|h|Hchannel:%s|h[%s]|h",
 	URL = "L_URL",
 	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",
 	COPY="L_CPY",
-	COPYTEMPLATE="|HL_CPY|h %s"
 }
 
 LurUI.chat.SHORTAGE = {
@@ -68,10 +67,13 @@ local function formUrlLink(text)
 end
 
 local shortage = LurUI.chat.SHORTAGE;
-local function formChannelName(text, modif)
+local function formChannelName(timeText, text, modif)
 	local value = shortage[modif] and shortage[modif] or shortage[text]
 	if (value ~= nil) then
-		return string.format(LurUI.chat.channelTemplate, text, value)
+		if (not timeText or strlen(timeText) < 2) then
+			timeText = "*"
+		end
+		return string.format(LurUI.chat.channelTemplate, timeText, text, value)
 	end
 end
 
@@ -87,7 +89,6 @@ local function hook_addMessage(self, text, ...)
   -- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16
   local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
   fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
-  fomattedText = LurUI.chat.COPYTEMPLATE:format(fomattedText)
   self:old_addMessage(fomattedText, ...)
 end
 

@@ -30,8 +30,8 @@ LurUI.chat = {
 	timePattern = "^([%d:]*[ AaPpMm]*)",
 	timeTemplate = "|HL_CPY|h%s|h",
 
-	channelPattern = "^([%d:]*[ AaPpMm]*) |Hchannel:([%a_]+:?%d?)|h(%b[])|h",
-	channelTemplate = "%s |Hchannel:%s|h[%s]|h",
+	channelPattern = "^([%d:]*[ AaPpMm]* )|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
+	channelTemplate = "%s|Hchannel:%s|h[%s]|h",
 
 	URL = "L_URL",
 	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",

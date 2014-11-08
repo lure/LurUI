@@ -30,8 +30,8 @@ LurUI.chat = {
 	timePattern = "^([%d:]*[ AaPpMm]*)",
 	timeTemplate = "|HL_CPY|h%s|h",
 
-	channelPattern = "|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
-	channelTemplate = "|Hchannel:%s|h[%s]|h",
+	channelPattern = "^([%d:]*[ AaPpMm]*) |Hchannel:([%a_]+:?%d?)|h(%b[])|h",
+	channelTemplate = "%s |Hchannel:%s|h[%s]|h",
 
 	URL = "L_URL",
 	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",
@@ -79,10 +79,11 @@ local function formTimeURL(timeText)
 end
 
 local shortage = LurUI.chat.SHORTAGE;
-local function formChannelName(text, modif)
+local function formChannelName(timeText, text, modif)
 	local value = shortage[modif] and shortage[modif] or shortage[text]
+	--ChatFrame1:old_addMessage(value.."<>".. text.."<>".. modif)
 	if (value ~= nil) then
-		return string.format(LurUI.chat.channelTemplate, text, value)
+		return string.format(LurUI.chat.channelTemplate, timeText, text, value)
 	end
 end
 
@@ -95,9 +96,9 @@ end
 
 local function hook_addMessage(self, text, ...) 
   -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
-  -- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16
-  local fomattedText = text:gsub(LurUI.chat.timePattern, formTimeURL)
-  fomattedText = fomattedText:gsub(LurUI.chat.channelPattern, formChannelName)
+  -- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16  
+  local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
+  fomattedText = fomattedText:gsub(LurUI.chat.timePattern, formTimeURL)
   fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
   self:old_addMessage(fomattedText, ...)
 end

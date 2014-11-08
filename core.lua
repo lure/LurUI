@@ -12,6 +12,8 @@ SlashCmdList.LURROLL = function() RandomRoll(1,100) end
 SLASH_LURROLL1 = '/кщдд'
 
 LurUI = {}
+hooksecurefunc("CastingBarFrame_OnShow", function() CastingBarFrame:SetPoint("BOTTOM", 0, 107) end)
+
 
 function LurUI:getFreeInventoryNum(bagtype)
   local commonbag, specificbag = 0, 0;

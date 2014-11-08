@@ -26,8 +26,13 @@ StaticPopupDialogs["CHAT_LINK"] = {
 
 LurUI.chat = {
 	urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+",
-	channelPattern = "^([%d:]*[ AaPpMm]*)|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
-	channelTemplate = "|HL_CPY|h%s|h|Hchannel:%s|h[%s]|h",
+
+	timePattern = "^([%d:]*[ AaPpMm]*)",
+	timeTemplate = "|HL_CPY|h%s|h",
+
+	channelPattern = "|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
+	channelTemplate = "|Hchannel:%s|h[%s]|h",
+
 	URL = "L_URL",
 	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",
 	COPY="L_CPY",
@@ -66,14 +71,18 @@ local function formUrlLink(text)
   return string.format(LurUI.chat.URLTEMPLATE, text, text)
 end
 
+local function formTimeURL(timeText)
+	if (not timeText or strlen(timeText) < 2) then
+		timeText = "*"
+	end
+	return LurUI.chat.timeTemplate:format(timeText)
+end
+
 local shortage = LurUI.chat.SHORTAGE;
-local function formChannelName(timeText, text, modif)
+local function formChannelName(text, modif)
 	local value = shortage[modif] and shortage[modif] or shortage[text]
 	if (value ~= nil) then
-		if (not timeText or strlen(timeText) < 2) then
-			timeText = "*"
-		end
-		return string.format(LurUI.chat.channelTemplate, timeText, text, value)
+		return string.format(LurUI.chat.channelTemplate, text, value)
 	end
 end
 
@@ -87,7 +96,8 @@ end
 local function hook_addMessage(self, text, ...) 
   -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
   -- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16
-  local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
+  local fomattedText = text:gsub(LurUI.chat.timePattern, formTimeURL)
+  fomattedText = fomattedText:gsub(LurUI.chat.channelPattern, formChannelName)
   fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
   self:old_addMessage(fomattedText, ...)
 end

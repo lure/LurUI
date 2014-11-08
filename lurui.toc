@@ -6,12 +6,11 @@
 
 core.lua
 map.lua
---poison.lua
-
 chat.lua
 classicon.lua
 postal.lua
 selljunk.lua
 wipeitem.lua
+--poison.lua
 --makemovable.lua
 --testframe.xml

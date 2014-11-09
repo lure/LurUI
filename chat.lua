@@ -36,6 +36,7 @@ LurUI.chat = {
 	URL = "L_URL",
 	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",
 	COPY="L_CPY",
+	TIMESTAMPFORMAT = "%H:%M:%S ",
 }
 
 LurUI.chat.SHORTAGE = {
@@ -103,9 +104,12 @@ local function hook_addMessage(self, text, ...)
 		if (fomattedText:match(LurUI.chat.timePattern)) then
 			fomattedText = fomattedText:gsub(LurUI.chat.timePattern, formTimeURL)
 		else
-			fomattedText = LurUI.chat.timeTemplate:format("*")..fomattedText
+			fomattedText = LurUI.chat.timeTemplate:format(BetterDate(CHAT_TIMESTAMP_FORMAT, time()))..fomattedText
 		end
+	else
+		fomattedText = LurUI.chat.timeTemplate:format(BetterDate(LurUI.chat.TIMESTAMPFORMAT, time()))..fomattedText
 	end
+	
 	fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
 	self:old_addMessage(fomattedText, ...)
 end

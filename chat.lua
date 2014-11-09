@@ -27,11 +27,11 @@ StaticPopupDialogs["CHAT_LINK"] = {
 LurUI.chat = {
 	urlPattern = "[hHwWfF][tTwW][tTwWpP][%.pP:]%S+%.[%w%d%?/;=:_%-%%%&#]+",
 
-	timePattern = "^([%d:]*[ AaPpMm]*)",
+	timePattern = "^([%d:]+[ AaPpMm]*)",
 	timeTemplate = "|HL_CPY|h%s|h",
 
-	channelPattern = "^([%d:]*[ AaPpMm]*)|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
-	channelTemplate = "%s |Hchannel:%s|h[%s]|h",
+	channelPattern = "^([%d:]*%s?[AaPpMm]*%s?)|Hchannel:([%a_]+:?%d?)|h(%b[])|h",
+	channelTemplate = "%s|Hchannel:%s|h[%s]|h",
 
 	URL = "L_URL",
 	URLTEMPLATE = "|cffffd000|HL_URL:%s|h%s|h|r",
@@ -95,12 +95,19 @@ LurUI.chat.ShowPopup = function(text)
 end
 
 local function hook_addMessage(self, text, ...) 
-  -- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
-  -- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16  
-  local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
-  fomattedText = fomattedText:gsub(LurUI.chat.timePattern, formTimeURL)
-  fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
-  self:old_addMessage(fomattedText, ...)
+	-- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
+	-- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16  
+	local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
+  
+	if (CHAT_TIMESTAMP_FORMAT) then
+		if (fomattedText:match(LurUI.chat.timePattern)) then
+			fomattedText = fomattedText:gsub(LurUI.chat.timePattern, formTimeURL)
+		else
+			fomattedText = LurUI.chat.timeTemplate:format("*")..fomattedText
+		end
+	end
+	fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
+	self:old_addMessage(fomattedText, ...)
 end
 
 --[[ 
@@ -113,12 +120,12 @@ function ChatFrame_OnHyperlinkShow(self, link, text, button)
   if (urltype == LurUI.chat.URL) then
     LurUI.chat.ShowPopup (urllink)
   elseif (link == LurUI.chat.COPY) then
-    local hyperbutton = GetMouseFocus(); 
+    local hyperbutton = GetMouseFocus();
 	if (hyperbutton:IsObjectType("HyperLinkButton") and "RightButton" == button) then
 		local _, fontstring = hyperbutton:GetPoint(1)
 		if(fontstring:IsObjectType("FontString")) then
-			LurUI.chat.ShowPopup (fontstring:GetText())		
-		end		
+			LurUI.chat.ShowPopup (fontstring:GetText())
+		end
 	end
   else
     real_OnHyperlinkShow(self, link, text, button)

@@ -156,8 +156,8 @@ mailButton:SetScript("OnClick", function()
         inprogress = true;
         chosen = UIDropDownMenu_GetText(PostalMailTypes)
 
-        mailID, _ = GetInboxNumItems()		
-        ShowMessage("you got " .. mailID .. " letters in your box")
+        mCount, _ = GetInboxNumItems()		
+        ShowMessage("POSTAL: you've got " .. mCount .. " letters")
 		
 		startMoney = GetMoney() 
         lastMail, totalMoney, lastMoney = 0, 0, 0, 0

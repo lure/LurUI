@@ -79,12 +79,13 @@ local function formTimeURL(timeText)
 	return LurUI.chat.timeTemplate:format(timeText)
 end
 
+local lcons = LurUI.chat
 local shortage = LurUI.chat.SHORTAGE;
 local function formChannelName(timeText, text, modif)
 	local value = shortage[modif] and shortage[modif] or shortage[text]
 	--ChatFrame1:old_addMessage(value.."<>".. text.."<>".. modif)
 	if (value ~= nil) then
-		return string.format(LurUI.chat.channelTemplate, timeText, text, value)
+		return string.format(lcons.channelTemplate, timeText, text, value)
 	end
 end
 
@@ -98,19 +99,19 @@ end
 local function hook_addMessage(self, text, ...) 
 	-- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
 	-- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16  
-	local fomattedText = text:gsub(LurUI.chat.channelPattern, formChannelName)
+	local fomattedText = text:gsub(lcons.channelPattern, formChannelName)
   
 	if (CHAT_TIMESTAMP_FORMAT) then
-		if (fomattedText:match(LurUI.chat.timePattern)) then
-			fomattedText = fomattedText:gsub(LurUI.chat.timePattern, formTimeURL)
+		if (fomattedText:match(lcons.timePattern)) then
+			fomattedText = fomattedText:gsub(lcons.timePattern, formTimeURL)
 		else
-			fomattedText = LurUI.chat.timeTemplate:format(BetterDate(CHAT_TIMESTAMP_FORMAT, time()))..fomattedText
+			fomattedText = lcons.timeTemplate:format(BetterDate(CHAT_TIMESTAMP_FORMAT, time()))..fomattedText
 		end
 	else
-		fomattedText = LurUI.chat.timeTemplate:format(BetterDate(LurUI.chat.TIMESTAMPFORMAT, time()))..fomattedText
+		fomattedText = lcons.timeTemplate:format(BetterDate(lcons.TIMESTAMPFORMAT, time()))..fomattedText
 	end
 	
-	fomattedText = fomattedText:gsub(LurUI.chat.urlPattern, formUrlLink)
+	fomattedText = fomattedText:gsub(lcons.urlPattern, formUrlLink)
 	self:old_addMessage(fomattedText, ...)
 end
 
@@ -142,7 +143,7 @@ end
 local old = ItemRefTooltip.SetHyperlink 
 function ItemRefTooltip:SetHyperlink(link, ...)
 	local lnk = link:sub(0, 5)
-	if (lnk == LurUI.chat.URL) or (lnk == LurUI.chat.COPY) then
+	if (lnk == lcons.URL) or (lnk == lcons.COPY) then
 		return
 	end
 	return old(self, link, ...)
@@ -150,16 +151,16 @@ end
 
 local function LUR_OnHyperlinkClick(self, link, string, button, ...)
 	local linkType = strsplit(":", link)
-	if (linkType == LurUI.chat.URL) then
+	if (linkType == lcons.URL) then
 		local urltype, urllink = link:match("(%a+):(.+)")
-		LurUI.chat.ShowPopup(urllink)
+		lcons.ShowPopup(urllink)
 	end
-	if (linkType == LurUI.chat.COPY)then
+	if (linkType == lcons.COPY)then
 		local hyperbutton = GetMouseFocus(); 
 		if (hyperbutton:IsObjectType("HyperLinkButton") and "RightButton" == button) then
 			local _, fontstring = hyperbutton:GetPoint(1)
 			if(fontstring:IsObjectType("FontString")) then
-				LurUI.chat.ShowPopup (fontstring:GetText())		
+				lcons.ShowPopup (fontstring:GetText())		
 			end		
 		end
 	end		

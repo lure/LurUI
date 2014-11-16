@@ -9,6 +9,7 @@ LurUI.SellJunk = {
 	}
 local lurui = LurUI.SellJunk
 local RESUMETEMPLATE = "SELLJUNK: Sold %s item(s) for %s"
+local _ = nil
 
 -- [[ hooking MailFrame ]]--
 hooksecurefunc(MerchantFrame, "Show", function()
@@ -36,7 +37,7 @@ SellButton:SetScript("OnClick", function()
 				return 
 			end
 						
-			_, count, _, _, _, _, link = GetContainerItemInfo(container, slot)
+			local _, count, _, _, _, _, link = GetContainerItemInfo(container, slot)
 			if (link) then 
 				_, _, quality, _, _, _, _, _, _, _, vendorPrice = GetItemInfo(link)
 			end

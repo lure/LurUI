@@ -1,14 +1,13 @@
 --[[ 	
 	Adds player's coordinates to the map
 ]]--
-local coordMouse = WorldMapFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-coordMouse:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 300, 9)
+local coordMouse = WorldMapTitleButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
+coordMouse:SetPoint("TOPLEFT", WorldMapFrameSizeUpButton, "TOPLEFT", -270, -12)
 coordMouse:SetJustifyH("LEFT")
-local coordPlayer = WorldMapFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-coordPlayer:SetPoint("BOTTOMLEFT", WorldMapPositioningGuide, "BOTTOMLEFT", 420, 9)
+local coordPlayer = WorldMapTitleButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
+coordPlayer:SetPoint("TOPLEFT", WorldMapFrameSizeUpButton, "TOPLEFT", -140, -12)
 coordPlayer:SetJustifyH("LEFT")
-
-
+ 
 local function GetMouseCoord()
 	local scale = WorldMapDetailFrame:GetEffectiveScale()
 	local width = WorldMapDetailFrame:GetWidth()

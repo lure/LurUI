@@ -73,9 +73,6 @@ local function formUrlLink(text)
 end
 
 local function formTimeURL(timeText)
-	if (not timeText or strlen(timeText) < 2) then
-		timeText = "*"
-	end
 	return LurUI.chat.timeTemplate:format(timeText)
 end
 
@@ -98,17 +95,13 @@ end
 
 local function hook_addMessage(self, text, ...) 
 	-- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
-	-- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16  
+	-- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16
 	local fomattedText = text:gsub(lcons.channelPattern, formChannelName)
   
-	if (CHAT_TIMESTAMP_FORMAT) then
-		if (fomattedText:match(lcons.timePattern)) then
-			fomattedText = fomattedText:gsub(lcons.timePattern, formTimeURL)
-		else
-			fomattedText = lcons.timeTemplate:format(BetterDate(CHAT_TIMESTAMP_FORMAT, time()))..fomattedText
-		end
+	if (CHAT_TIMESTAMP_FORMAT) and (fomattedText:match(lcons.timePattern)) then
+		fomattedText = fomattedText:gsub(lcons.timePattern, formTimeURL)
 	else
-		fomattedText = lcons.timeTemplate:format(BetterDate(lcons.TIMESTAMPFORMAT, time()))..fomattedText
+		fomattedText = lcons.timeTemplate:format(BetterDate(CHAT_TIMESTAMP_FORMAT, time()))..fomattedText
 	end
 	
 	fomattedText = fomattedText:gsub(lcons.urlPattern, formUrlLink)

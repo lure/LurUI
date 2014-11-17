@@ -1,11 +1,11 @@
 --[[ 	
 	Adds player's coordinates to the map
 ]]--
-local coordMouse = WorldMapTitleButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
-coordMouse:SetPoint("TOPLEFT", WorldMapFrameSizeUpButton, "TOPLEFT", -270, -12)
+local coordMouse = WorldMapFrameCloseButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
+coordMouse:SetPoint("TOPLEFT", WorldMapFrameCloseButton, "TOPLEFT", -270, -12)
 coordMouse:SetJustifyH("LEFT")
-local coordPlayer = WorldMapTitleButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
-coordPlayer:SetPoint("TOPLEFT", WorldMapFrameSizeUpButton, "TOPLEFT", -140, -12)
+local coordPlayer = WorldMapFrameCloseButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
+coordPlayer:SetPoint("TOPLEFT", WorldMapFrameCloseButton, "TOPLEFT", -140, -12)
 coordPlayer:SetJustifyH("LEFT")
  
 local function GetMouseCoord()
@@ -39,8 +39,4 @@ WorldMapFrame:HookScript("OnUpdate", function(self, button)
 		local mx, my = GetMouseCoord()
 		coordMouse:SetText(string.format("mouse = %04.1f / %04.1f", mx, my))
 		coordPlayer:SetText(string.format("you = %04.1f / %04.1f", px, py))
-    end)	
-
-
-
-
+    end)

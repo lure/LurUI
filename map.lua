@@ -1,10 +1,10 @@
 --[[ 	
 	Adds player's coordinates to the map
 ]]--
-local coordMouse = WorldMapFrameCloseButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
+local coordMouse = WorldMapFrameCloseButton:CreateFontString(nil, "BORDER", "GameFontNormal")
 coordMouse:SetPoint("TOPLEFT", WorldMapFrameCloseButton, "TOPLEFT", -270, -12)
 coordMouse:SetJustifyH("LEFT")
-local coordPlayer = WorldMapFrameCloseButton:CreateFontString(nil, "HIGHLIGHT ", "GameFontNormal")
+local coordPlayer = WorldMapFrameCloseButton:CreateFontString(nil, "BORDER", "GameFontNormal")
 coordPlayer:SetPoint("TOPLEFT", WorldMapFrameCloseButton, "TOPLEFT", -140, -12)
 coordPlayer:SetJustifyH("LEFT")
  

@@ -93,17 +93,17 @@ LurUI.chat.ShowPopup = function(text)
     popup.editBox:SetFocus()
 end
 
-local function hook_addMessage(self, text, ...) 
+local function hook_addMessage(self, text, ...)
 	-- |Hchannel:channel:1|h[1. Общий: Бесплодные земли]|h|Hplayer:[Солта]
 	-- |Hchannel:INSTANCE_CHAT|h[Подземелье]|h |Hplayer:Солта-СтражСмерти:2937:INSTANCE_CHAT|h[|cffffffffДобров|r]|h: 1 8 16
 	local fomattedText = text:gsub(lcons.channelPattern, formChannelName)
-  
+
 	if (CHAT_TIMESTAMP_FORMAT) and (fomattedText:match(lcons.timePattern)) then
 		fomattedText = fomattedText:gsub(lcons.timePattern, formTimeURL)
 	else
 		fomattedText = lcons.timeTemplate:format(BetterDate(CHAT_TIMESTAMP_FORMAT, time()))..fomattedText
 	end
-	
+
 	fomattedText = fomattedText:gsub(lcons.urlPattern, formUrlLink)
 	self:old_addMessage(fomattedText, ...)
 end

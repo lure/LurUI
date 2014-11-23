@@ -11,6 +11,7 @@ classicon.lua
 postal.lua
 selljunk.lua
 wipeitem.lua
+currency.lua
 --poison.lua
 --makemovable.lua
 --testframe.xml

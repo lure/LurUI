@@ -101,7 +101,7 @@ local function hook_addMessage(self, text, ...)
 	if (CHAT_TIMESTAMP_FORMAT) and (fomattedText:match(lcons.timePattern)) then
 		fomattedText = fomattedText:gsub(lcons.timePattern, formTimeURL)
 	else
-		fomattedText = lcons.timeTemplate:format(BetterDate(CHAT_TIMESTAMP_FORMAT, time()))..fomattedText
+		fomattedText = lcons.timeTemplate:format(BetterDate("%H:%M:%S ", time()))..fomattedText
 	end
 
 	fomattedText = fomattedText:gsub(lcons.urlPattern, formUrlLink)

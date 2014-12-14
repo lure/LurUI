@@ -6,10 +6,12 @@
 * P.S.: thanks to Borlox, who proved my guesses 
 ]]--
 
-LurUI.currency = {
-	frameLoaded = false
+LurUI.garrison = {
+	GarrisonLoaded = false,
+	resLabel=nil,
+	resIcon = nil,
 }
-local ui = LurUI.currency
+local ui = LurUI.garrison
 
 local function CreateUIString(x,y, text)
 	local label = GarrisonLandingPage:CreateFontString(nil, "BORDER", "GameFontNormal")
@@ -27,12 +29,11 @@ local function CreateResTexture()
 end
 
 hooksecurefunc("Garrison_LoadUI", function()
-	if (not ui.frameLoaded) then
-		ui.frameLoaded = true
+	if (not ui.GarrisonLoaded) then
+		ui.GarrisonLoaded = true
 		ui.resLabel = CreateUIString(80, -15, "0/0")
 		ui.resIcon = CreateResTexture()
 		ui.resIcon:SetPoint("LEFT", ui.resLabel, "RIGHT", 5, 0)
-		
 		
 		GarrisonLandingPage:HookScript("OnUpdate", function(self, button)
 			local _, CurrentAmount, _, _, _, totalMax, _ = GetCurrencyInfo(GARRISON_CURRENCY)

@@ -1,0 +1,64 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">	
+	<Script file="GarrisonUI.lua"/>		
+  	<Frame name="LurThreatsFrame" virtual="true">
+		<Size x="0" y="26"/>
+		<Anchors>
+		   <Anchor point="CENTER">
+			   <Offset><AbsDimension x="-200" y="200"/></Offset>
+		   </Anchor>
+	   </Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="BG" file="Interface\FriendsFrame\UI-Toast-FriendOnlineIcon">
+					<Size x="34" y="34"/>
+					<Anchors>
+						<Anchor point="LEFT" x="0" y="2"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="FollowerCount" inherits="GameFontNormalLarge">
+					<Anchors>
+						<Anchor point="LEFT" x="10" y="2"/>
+					</Anchors>
+					<Color r="1" g="0" b="0" />
+				</FontString>
+				<Texture parentKey="EnvIcon">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.BG" relativePoint="RIGHT" x="3" y="0"/>
+						<!-- <Anchor point="LEFT"/> -->
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentArray="Threats" inherits="LurCounterTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.EnvIcon" relativePoint="RIGHT" x="9" y="0"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+		
+	<Frame name="LurCounterTemplate" virtual="true">
+		<Size x="20" y="20"/>
+		<Layers>
+			<Layer level="ARTWORK" textureSubLevel="-1">
+				<Texture parentKey="Icon">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Border" atlas="GarrMission_EncounterAbilityBorder" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>		
+		
+</Ui>

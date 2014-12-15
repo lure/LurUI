@@ -52,6 +52,9 @@ function LurUI.garrison.LUR_GShowRewardAmount(self, rewards, numRewards)
 					Reward.Quantity:SetText(reward.followerXP);
 				end
 				Reward.Quantity:Show();
+			elseif(reward.itemID ~= 120205 and not Reward.Quantity:IsVisible()) then
+				Reward.Quantity:SetText(select(4, GetItemInfo(reward.itemID)));
+				Reward.Quantity:Show();
 			end
 			index = index + 1; 
 		end
@@ -136,7 +139,11 @@ function LurUI.garrison.LUR_Landing()
 								Reward.Quantity:SetText(reward.followerXP);
 							end
 							Reward.Quantity:Show();
+						elseif(reward.itemID ~= 120205 and not Reward.Quantity:IsVisible()) then
+							Reward.Quantity:SetText(select(4, GetItemInfo(reward.itemID)));
+							Reward.Quantity:Show();
 						end
+						
 						rewardIndex = rewardIndex + 1;
 					end
 				end

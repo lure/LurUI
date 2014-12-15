@@ -122,7 +122,8 @@ function LUR_MarkCompletedMissions()
 	end
 end
 
--- /run LUR_B(C_Garrison.GetCompleteMissions()[4], true)
+-- /run LUR_PrintMissionSummary(C_Garrison.GetCompleteMissions()[4], true)
+--/ /run LUR_PrintMissionSummary(C_Garrison.GetAvailableMissions()[4], true)
 function LUR_PrintMissionSummary(mission, succeeded)
 	if (mission) then
 		local success = succeeded and ("|cFF00FF00"..SCENARIO_BONUS_SUCCESS.."|r ") or ("|cFFFF0000"..FAILED .. "|r ");

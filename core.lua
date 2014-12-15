@@ -89,8 +89,8 @@ function LUR_InitMissionAutoCompletist()
 			local missionID, canComplete, succeeded = ...;
 			-- Иногда сундук открыть нельзя. Видимо, я неправильно обрабатывать 'succeeded'
 			LUR_PrintMissionSummary(self.missionList[missionID], succeeded)
+			self.missionList[missionID] = nil;
 			if C_Garrison.CanOpenMissionChest(missionID) then
-				self.missionList[missionID] = nil;
 				C_Garrison.MissionBonusRoll(missionID);
 			end
 			if (LUR_GarnisonIsOpen() and (#(self.missionList) == 0)) then
@@ -127,27 +127,25 @@ function LUR_PrintMissionSummary(mission, succeeded)
 	if (mission) then
 		local success = succeeded and ("|cFF00FF00"..SCENARIO_BONUS_SUCCESS.."|r ") or ("|cFFFF0000"..FAILED .. "|r ");
 		print(success .. mission.name);
-		if succeeded then
-			for _, reward in pairs (mission.rewards) do
-				local title = reward.title and " " .. reward.title or "";
-				local name = reward.name and " " ..reward.name or "";
-				
-				local quant = "";
-				if (reward.currencyID and reward.currencyID == 0) then
-					quant = " " .. GetCoinTextureString(reward.quantity);
-				else 
-					quant = reward.quantity and (" " ..reward.quantity) or "";
-				end
-				
-				local currency = reward.currencyID and (" " .. GetCurrencyInfo(reward.currencyID)) or "";
-				
-				local item = "";
-				if (reward.itemID) then
-					local itemName, itemLink, itemRarity = GetItemInfo(reward.itemID);
-					item = " " ..(itemLink or COMBATLOG_UNKNOWN_UNIT);
-				end
-				print("    " .. SCENARIO_BONUS_REWARD .. " " .. title .. name .. quant .. currency .. item)
+		for _, reward in pairs (mission.rewards) do
+			local title = reward.title and " " .. reward.title or "";
+			local name = reward.name and " " ..reward.name or "";
+			
+			local quant = "";
+			if (reward.currencyID and reward.currencyID == 0) then
+				quant = " " .. GetCoinTextureString(reward.quantity);
+			else 
+				quant = reward.quantity and (" " ..reward.quantity) or "";
 			end
+			
+			local currency = reward.currencyID and (" " .. GetCurrencyInfo(reward.currencyID)) or "";
+			
+			local item = "";
+			if (reward.itemID) then
+				local itemName, itemLink, itemRarity = GetItemInfo(reward.itemID);
+				item = " " ..(itemLink or COMBATLOG_UNKNOWN_UNIT);
+			end
+			print("    " .. SCENARIO_BONUS_REWARD .. " " .. title .. name .. quant .. currency .. item)
 		end
 	end
 end

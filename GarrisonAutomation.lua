@@ -19,7 +19,10 @@ function LurUI.GarrisonAuto.InitMissionAutoCompletist()
 		if ( event == "GARRISON_MISSION_COMPLETE_RESPONSE" ) then
 			local missionID, canComplete, succeeded = ...;
 			
-			self.missionPrint[self.missionList[missionID]] = succeeded;
+			local missionAsKey = self.missionList[missionID];
+			if missionAsKey then
+				self.missionPrint[missionAsKey] = succeeded;
+			end
 			self.missionList[missionID] = nil;
 			
 			if C_Garrison.CanOpenMissionChest(missionID) then

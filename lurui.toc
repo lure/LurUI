@@ -14,3 +14,4 @@ wipeitem.lua
 currency.lua
 GarrisonUI.xml
 GarrisonUI.lua
+GarrisonAutomation.lua

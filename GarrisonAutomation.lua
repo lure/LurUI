@@ -98,9 +98,10 @@ LurUI.GarrisonAuto.InitMissionAutoCompletist();
 hooksecurefunc("Garrison_LoadUI", function()
 	if (not LurUI.GarrisonAuto.autoorder) then
 		LurUI.GarrisonAuto.autoorder = true;
-		local f = CreateFrame("Button", nil, GarrisonCapacitiveDisplayFrame, "OptionsButtonTemplate");
+		LurUI.GarrisonAuto.OrderButton = CreateFrame("Button", nil, GarrisonCapacitiveDisplayFrame, "OptionsButtonTemplate");
+		local f = LurUI.GarrisonAuto.OrderButton;
 		f:SetText("AutoOrder");
-		f:SetPoint("BOTTOMRIGHT", GarrisonCapacitiveDisplayFrame.StartWorkOrderButton, "TOPRIGHT", 0, 20);
+		f:SetPoint("BOTTOMRIGHT", GarrisonCapacitiveDisplayFrame.StartWorkOrderButton, "TOPRIGHT", 0, 5);
 		f:SetScript("OnClick", function() 
 			local maxShipments = GarrisonCapacitiveDisplayFrame.maxShipments;
 			local numPending = C_Garrison.GetNumPendingShipments();
@@ -109,3 +110,10 @@ hooksecurefunc("Garrison_LoadUI", function()
 		end);
 	end
 end)
+
+
+lu_frame = CreateFrame("Frame", nil, UIParent);
+lu_frame:RegisterEvent("BATTLEFIELD_MGR_ENTRY_INVITE");
+lu_frame:SetScript("OnEvent", function(self, event, ...) local battleID, areaName = ...; print(battleID, areaName); PlaySound("PVPTHROUGHQUEUE", "Master"); end)
+print("sound alarm is ready")
+-- PlaySoundFile("Sound\\interface\\RaidWarning.wav", "Master"); 

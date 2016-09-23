@@ -143,7 +143,6 @@ function LurUI.garrison.LUR_Landing()
 							Reward.Quantity:SetText(select(4, GetItemInfo(reward.itemID)));
 							Reward.Quantity:Show();
 						end
-						
 						rewardIndex = rewardIndex + 1;
 					end
 				end

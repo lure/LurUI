@@ -154,7 +154,7 @@ mailButton:SetText("Get mail")
 mailButton:SetScript("OnClick", function()
     if (not inprogress) then
         inprogress = true;
-        chosen = UIDropDownMenu_GetText(PostalMailTypes)
+        chosen = Lib_UIDropDownMenu_GetText(PostalMailTypes)
 
         mailID, _ = GetInboxNumItems()		
         ShowMessage("POSTAL: you've got " .. mailID .. " letters")
@@ -202,23 +202,23 @@ local items = {
 local function initialize(self, level)
     local info
     for k, v in pairs(items) do
-        info = UIDropDownMenu_CreateInfo()
+        info = Lib_UIDropDownMenu_CreateInfo()
         info.text = k
         info.value = v
-        info.func = function(self) UIDropDownMenu_SetSelectedID(PostalMailTypes, self:GetID()) end
-        UIDropDownMenu_AddButton(info, level)
+        info.func = function(self) Lib_UIDropDownMenu_SetSelectedID(PostalMailTypes, self:GetID()) end
+        Lib_UIDropDownMenu_AddButton(info, level)
     end
 end
 
 -- Adding the button  http://wowprogramming.com/forums/development/159
-local mailType = CreateFrame("Frame", "PostalMailTypes", InboxFrame, "UIDropDownMenuTemplate")
+local mailType = CreateFrame("Frame", "PostalMailTypes", InboxFrame, "Lib_UIDropDownMenuTemplate")
 mailType:SetPoint("RIGHT", mailButton, "LEFT", -2, -2)
-UIDropDownMenu_Initialize(PostalMailTypes, initialize)
-UIDropDownMenu_SetWidth(PostalMailTypes, 80);
-UIDropDownMenu_SetButtonWidth(PostalMailTypes, 124)
-UIDropDownMenu_SetSelectedID(PostalMailTypes, 1)
-UIDropDownMenu_SetText(PostalMailTypes, items["all"])
-UIDropDownMenu_JustifyText(PostalMailTypes, "LEFT")
+Lib_UIDropDownMenu_Initialize(PostalMailTypes, initialize)
+Lib_UIDropDownMenu_SetWidth(PostalMailTypes, 80);
+Lib_UIDropDownMenu_SetButtonWidth(PostalMailTypes, 124)
+Lib_UIDropDownMenu_SetSelectedID(PostalMailTypes, 1)
+Lib_UIDropDownMenu_SetText(PostalMailTypes, items["all"])
+Lib_UIDropDownMenu_JustifyText(PostalMailTypes, "LEFT")
 
 -- [[ hooking MailFrame ]]--
 hooksecurefunc(MailFrame, "Hide", function()

@@ -9,15 +9,15 @@ coordPlayer:SetPoint("TOPLEFT", WorldMapFrameCloseButton, "TOPLEFT", -140, -12)
 coordPlayer:SetJustifyH("LEFT")
  
 local function GetMouseCoord()
-	local scale = WorldMapDetailFrame:GetEffectiveScale()
-	local width = WorldMapDetailFrame:GetWidth()
-	local height = WorldMapDetailFrame:GetHeight()
-	local centerX, centerY = WorldMapDetailFrame:GetCenter()
+	local scale = WorldMapFrame.BorderFrame:GetEffectiveScale()
+	local width = WorldMapFrame.ScrollContainer:GetWidth()
+	local height = WorldMapFrame.ScrollContainer:GetHeight()
+	local centerX, centerY = WorldMapFrame.ScrollContainer:GetCenter()
 	local x, y = GetCursorPosition()	
-	local adjustedX = (x/scale - (centerX - width / 2)) / width
+	local adjustedX = (x / scale - (centerX - width / 2)) / width
 	local adjustedY = (centerY + (height/2) - y / scale) / height  
 
-	if (adjustedX >= 0  and adjustedY >= 0 and adjustedX <=1 and adjustedY <=1) then
+	if (adjustedX >= 0  and adjustedY >= 0 and adjustedX <= 1 and adjustedY <= 1) then
 		adjustedX = adjustedX * 100
 		adjustedY = adjustedY * 100
 	else 
@@ -35,8 +35,10 @@ local function roundCoords(varx, vary)
 end
 
 WorldMapFrame:HookScript("OnUpdate", function(self, button)
-        local px, py = roundCoords(GetPlayerMapPosition("player"))
+
+	local map = C_Map.GetBestMapForUnit("player")
+	local px, py = C_Map.GetPlayerMapPosition(map, "player"):GetXY()
 		local mx, my = GetMouseCoord()
 		coordMouse:SetText(string.format("mouse = %04.1f / %04.1f", mx, my))
-		coordPlayer:SetText(string.format("you = %04.1f / %04.1f", px, py))
+		coordPlayer:SetText(string.format("you = %04.1f / %04.1f", px * 100, py * 100))
     end)

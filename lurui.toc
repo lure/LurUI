@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 90100
 ## Title: |cffee00fflurui|r
 ## Notes: Handful of useful addons.
 ## Version: 1.0.3
